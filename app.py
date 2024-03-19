@@ -6,7 +6,7 @@ from math import floor
 app = Flask(__name__)
 
 # Path to SQLite database file
-database_file = r'C:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup7.dxpdb'
+database_file = r'C:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup6.dxpdb'
 
 def get_db():
     db = getattr(g, '_database', None)
