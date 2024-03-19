@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flexbox overall-flexbox">
+    <div class="chart-container">
+        <div class="flexbox">
+            <div class="motorId">Motor X<br>
+                <div class="latestValue" id="latest-Spindle-chart1">0</div>
+            </div>
+        </div>
+        <canvas id="controlInputChart"></canvas>
+        <div class="flexbox">
+            <button id="buttonSpindle1" class="motor-button selected-button">
+                Spindle</button>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div class="flexbox">
+            <div class="motorId">Spindle 1<br>
+                <div class="latestValue" id="latest-Spindle1-chart2">0</div>
+            </div>
+            <div class="motorId">Spindle 2<br>
+                <div class="latestValue" id="latest-Spindle2-chart2">0</div>
+            </div>
+            <div class="motorId">Spindle 3<br>
+                <div class="latestValue" id="latest-Spindle4-chart2">0</div>
+            </div>
+        </div>
+        <canvas id="controlOutputChart"></canvas>
+        <div class="flexbox">
+            <button id="buttonSpindle 12" class="motor-button selected-button">
+                Spindle 1</button>
+            <button id="buttonSpindle 22" class="motor-button selected-button">
+                Spindle 2</button>
+            <button id="buttonSpindle 32" class="motor-button selected-button">
+                Spindle 3</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    // Global vars/accessible data objects
+    var controlInputData, controlOutputData;
+    var timerId;
+    const controlInputCanvasId = 'controlInputChart';
+    const controlOutputCanvasID = 'controlOutputChart';
+
+    // Event listeners
+    document.getElementById("buttonSpindle1").addEventListener("click", () => onFilterButtonClick('Spindle', 1));
+    document.getElementById("buttonSpindle 12").addEventListener("click", () => onFilterButtonClick('Spindle 1', 2));
+    document.getElementById("buttonSpindle 22").addEventListener("click", () => onFilterButtonClick('Spindle 2', 2));
+    document.getElementById("buttonSpindle 32").addEventListener("click", () => onFilterButtonClick('Spindle 3', 2));
+    document.addEventListener('DOMContentLoaded', async () => {
+        controlInputData = await fetchDataGroupLimited('ControlInput', 51);
+        controlInputData.reverse();
+        createControlInputCharts();
+        controlOutputData = await fetchDataGroupLimited('ControlOutput', 51);
+        controlOutputData.reverse();
+        createControlOutputCharts();
+        timerId = setInterval(pollServer, 1000);
+    });
+
+    function createControlInputCharts() {
+        const controlInputLabels = createLabels(controlInputData, 'Spindle'); // Second parameter can be any of the dataset names (it is supposed to be kinda inaccurate)
+        const controlInputDataset = createDataset(controlInputData, ['Spindle']);
+        // Create line chart with datasets for 'ControlInput'
+        createLineChart(controlInputCanvasId, controlInputLabels, controlInputDataset, 'ControlInput');
+    }
+
+    function createControlOutputCharts() {
+        const controlOutputLabels = createLabels(controlOutputData, 'Spindle 1'); // Second parameter can be any of the dataset names (it is supposed to be kinda inaccurate)
+        const controlOutputDataset = createDataset(controlOutputData, ['Spindle 1', 'Spindle 2', 'Spindle 3']);
+        // Create line chart with datasets for 'ControlOutput'
+        createLineChart(controlOutputCanvasID, controlOutputLabels, controlOutputDataset, 'ControlOutput');
+    }
+
+    function onFilterButtonClick(motor, chartNo) {
+        const button = document.getElementById(`button${motor}${chartNo}`);
+        button.classList.toggle("selected-button");
+        switch(chartNo) {
+            case 1:
+                datasetFilter(controlInputCanvasId, motor); 
+                break;
+            case 2:
+                datasetFilter(controlOutputCanvasID, motor);
+                break;
+            default:
+                break;
+        }
+    }
+
+    async function pollServer() {
+        const alphabetArray = ['Spindle 1', 'Spindle 2', '', 'Spindle 3'];
+        const systemTime = new Date().getTime();
+        // Shift x-axis labels for gainChart
+        let chart = Chart.getChart(document.getElementById(controlInputCanvasId).getContext('2d'));
+        chart.data.labels.push(systemTime);
+        chart.data.labels.shift();
+        for(var i = 0; i < 1; i++)  {
+            const latestRecord = await fetchDataSingular(`ControlInput${i+1}1`);
+            if(controlInputData.length >= 50)
+                controlInputData.shift();
+            controlInputData.push(latestRecord);
+            shiftLineChartData(controlInputCanvasId, 'Spindle', latestRecord);
+            document.getElementById(`latest-Spindle-chart1`).innerHTML = latestRecord[0].Value;
+        }
+        chart = Chart.getChart(document.getElementById(controlOutputCanvasID).getContext('2d'));
+        chart.data.labels.push(systemTime);
+        chart.data.labels.shift();
+        for(var i = 0; i < 4; i++)  {
+            if(i == 2)
+                continue;
+            const latestRecord = await fetchDataSingular(`ControlOutput${i+1}1`);
+            controlOutputData.shift();
+            controlOutputData.push(latestRecord);
+            shiftLineChartData(controlOutputCanvasID, `${alphabetArray[i]}`, latestRecord);
+            document.getElementById(`latest-Spindle${i+1}-chart2`).innerHTML = latestRecord[0].Value;
+        }
+    }
+</script>
+{% endblock%}
