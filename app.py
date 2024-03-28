@@ -62,7 +62,6 @@ db = client["test"]
 
 # Push csv file to MongoDB
 records = df.keys()
-
 db.testdata.insert_many(df.to_dict('records'))
 print(db.testdata.find_one())
 
