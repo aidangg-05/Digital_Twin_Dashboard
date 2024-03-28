@@ -59,6 +59,7 @@ client = MongoClient('mongodb+srv://JunHui:NJHltpbad@cluster0.oiasqth.mongodb.ne
 db = client["test"]
 #print(client)
 
+db.testdata.delete_many({})
 
 # Push csv file to MongoDB
 records = df.keys()
