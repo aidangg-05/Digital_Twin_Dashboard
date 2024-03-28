@@ -2,10 +2,10 @@ import sqlite3
 
 import pandas as pd
 
-#app = Flask(__name__)
+#C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
-database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb'
+database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
@@ -21,18 +21,19 @@ def column_exists(table_name, column_name):
             return True
     return False
 
+def delete_merged_table():
+    c.execute('DROP TABLE IF EXISTS MergedData')
+    conn.commit()
+    print("MergedData table deleted successfully!")
+    
+
+delete_merged_table()
+
 def merged():
     c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT * FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
     conn.commit()  
     print("Tables merged successfully!")
     
-    # Check if the column exists before attempting to drop it
-    if column_exists("MergedData", "NodeKey:1"):
-        c.execute('ALTER TABLE MergedData DROP COLUMN "NodeKey:1"')  # Use double quotes to handle special characters
-        conn.commit()
-        print("Column 'NodeKey:1' dropped successfully!")
-    else:
-        print("Column 'NodeKey:1' does not exist. Skipping drop operation.")
 
 merged()
 
