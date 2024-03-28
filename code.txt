@@ -1,0 +1,5 @@
+def delete_merged_table():
+    c.execute('DROP TABLE IF EXISTS MergedData')
+    conn.commit()
+    print("MergedData table deleted successfully!")
+    

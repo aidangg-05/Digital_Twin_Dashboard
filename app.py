@@ -8,6 +8,7 @@ from pymongo import MongoClient
 
 # Path to SQLite database file
 database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
+#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
