@@ -42,5 +42,13 @@ df = pd.read_sql_query("SELECT * FROM MergedData", conn)
 # Save DataFrame to CSV
 df.to_csv('MergedData.csv', index=False)
 
+# Read the CSV file into a DataFrame
+df_merged = pd.read_csv('MergedData.csv')
+
+# Get the number of rows
+num_rows = df_merged.shape[0]
+
+print("Number of rows in MergedData.csv:", num_rows)
+
 # Close the connection
 conn.close()
