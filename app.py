@@ -65,6 +65,7 @@ df_dropped = df_merged.drop(df_merged[df_merged.eq('0').any(axis=1)].index)
 print(df_dropped.shape)
 df_dropped2 = df_dropped[["Value"]].astype('hex')
 
+db.testdata.delete_many({})
 
 
 #Push csv file to MongoDB
