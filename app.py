@@ -63,15 +63,18 @@ print(df_merged.shape)
 # Drops rows "0"
 df_dropped = df_merged.drop(df_merged[df_merged.eq('0').any(axis=1)].index)
 print(df_dropped.shape)
-df_dropped2 = df_dropped[["Value"]].astype('hex')
 
+
+db.testdata.delete_many({})
 
 
 #Push csv file to MongoDB
 records = df.keys()
-db.testdata.insert_many(df_dropped2.to_dict('records'))
+db.testdata.insert_many(df_dropped.to_dict('records'))
 #print(db.testdata.find_one())
 
 
+#df.to_csv (r'C:\Digital_Twin\Digital_Twin_Dashboard\amendedData.csv', index = None, header=True) 
+#print('Data has been updated')
 # Close the connection
 conn.close()
