@@ -1,0 +1,13 @@
+# Fetch existing records from MongoDB
+existing_records = db.testdata.find({}, {'_id': 0})
+
+# Extract unique identifiers from existing records
+existing_ids = set(record['unique_id'] for record in existing_records)
+
+# Filter out rows from DataFrame which are already in MongoDB
+new_rows = df_merged[~df_merged['unique_id'].isin(existing_ids)]
+
+# Insert new rows into MongoDB
+if not new_rows.empty:
+    db.testdata.insert_many(new_rows.to_dict('records'))
+   
