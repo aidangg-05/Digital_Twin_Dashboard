@@ -20,30 +20,18 @@ c = conn.cursor()
 
 conn= sqlite3.connect(database_file)
 
-def column_exists(table_name, column_name):
-    # Check if the column exists in the table
-    c.execute(f"PRAGMA table_info({table_name})")
-    columns = c.fetchall()
-    for col in columns:
-        if col[1] == column_name:
-            return True
-    return False
-
-def delete_merged_table():
-    c.execute('DROP TABLE IF EXISTS MergedData')
-    conn.commit()
-    print("MergedData table deleted successfully!")
-    
-
-delete_merged_table()
 
 def merged():
-    c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT * FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
+    c.execute('''CREATE TABLE IF NOT EXISTS MergedData AS 
+                 SELECT * 
+                 FROM HistoricalData t1 
+                 LEFT JOIN MergedData t2 ON t1.NodeKey = t2.NodeKey
+                 WHERE t2.NodeKey IS NULL''')
     conn.commit()  
     print("Tables merged successfully!")
-    
 
 merged()
+
 
  # Read SQL database table into a DataFrame
 df = pd.read_sql_query("SELECT * FROM MergedData", conn)
