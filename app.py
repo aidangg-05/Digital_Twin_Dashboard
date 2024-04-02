@@ -9,8 +9,8 @@ from hex_to_int import is_hex
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
-#database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
-database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
+database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
+#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
@@ -84,7 +84,7 @@ existing_data = list(db.MotorData.find({}, {"_id": 0}))
 df_existing = pd.DataFrame(existing_data)
 
 # Find new rows in the DataFrame to append to MongoDB
-new_rows = df_merged[~df_merged.apply(tuple, axis=1).isin(df_existing.apply(tuple, axis=1))]
+new_rows = df_dropped[~df_dropped.apply(tuple, axis=1).isin(df_existing.apply(tuple, axis=1))]
 
 # Convert new rows to dictionary format
 new_rows_dict = new_rows.to_dict('records')
