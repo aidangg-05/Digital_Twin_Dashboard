@@ -3,6 +3,8 @@ import csv
 import json
 import pandas as pd
 from pymongo import MongoClient
+from filetime import to_datetime
+from hex_to_int import is_hex
 
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
@@ -54,27 +56,34 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
+#Input Connection String
 client = MongoClient()
 # DB name
 db = client["test"]
 #print(client)
 print(df_merged.shape)
 
-# Drops rows "0"
-df_dropped = df_merged.drop(df_merged[df_merged.eq('0').any(axis=1)].index)
-print(df_dropped.shape)
 
+# Sort DataFrame by 'NodeId'
+df_dropped = df_merged.sort_values(by=['NodeId','ServerTimeStamp'], ascending=[True, False])
 
+# Get top 5 rows for each unique NodeIds
+df_dropped = df_dropped.groupby('NodeId').head(20)
+
+# Convert 'ServerTimeStamp' and 'SourceTimeStamp' columns to datetime
+columns_to_convert = ['ServerTimeStamp', 'SourceTimeStamp']
+df_dropped[columns_to_convert] = df_dropped[columns_to_convert].apply(to_datetime)
+
+# Apply the conversion function only to hexadecimal strings in the 'value' column
+df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstance(x, str) and is_hex(x) else x)
+
+# Delete existing data in MongoDB collection
 db.testdata.delete_many({})
 
+df_dropped.to_csv('CleanedData.csv', index=False)
 
-#Push csv file to MongoDB
-records = df.keys()
+# Insert DataFrame records into MongoDB
 db.testdata.insert_many(df_dropped.to_dict('records'))
-#print(db.testdata.find_one())
 
-
-#df.to_csv (r'C:\Digital_Twin\Digital_Twin_Dashboard\amendedData.csv', index = None, header=True) 
-#print('Data has been updated')
 # Close the connection
 conn.close()
