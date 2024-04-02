@@ -9,8 +9,8 @@ from hex_to_int import is_hex
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
-database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
-#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
+#database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
+database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
@@ -56,12 +56,9 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
-#Input Connection String
-client = MongoClient()
+client = MongoClient('mongodb://localhost:27017/')
 # DB name
-db = client["test"]
-#print(client)
-print(df_merged.shape)
+db = client["DigitalTwin"]
 
 
 # Sort DataFrame by 'NodeId'
@@ -77,13 +74,27 @@ df_dropped[columns_to_convert] = df_dropped[columns_to_convert].apply(to_datetim
 # Apply the conversion function only to hexadecimal strings in the 'value' column
 df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstance(x, str) and is_hex(x) else x)
 
-# Delete existing data in MongoDB collection
-db.testdata.delete_many({})
-
 df_dropped.to_csv('CleanedData.csv', index=False)
 
 # Insert DataFrame records into MongoDB
 db.testdata.insert_many(df_dropped.to_dict('records'))
+
+# Read existing data from MongoDB
+existing_data = list(db.MotorData.find({}, {"_id": 0}))
+
+# Convert existing data to DataFrame
+df_existing = pd.DataFrame(existing_data)
+
+# Find new rows in the DataFrame to append to MongoDB
+new_rows = df_merged[~df_merged.apply(tuple, axis=1).isin(df_existing.apply(tuple, axis=1))]
+
+# Convert new rows to dictionary format
+new_rows_dict = new_rows.to_dict('records')
+
+# Insert new rows into MongoDB
+if new_rows_dict:
+    db.MotorData.insert_many(new_rows_dict)
+    print("New rows added to MongoDB.")
 
 # Close the connection
 conn.close()
