@@ -42,18 +42,27 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
-client = MongoClient('mongodb+srv://JunHui:NJHltpbad@cluster0.oiasqth.mongodb.net/')
+client = MongoClient()
 # DB name
 db = client["test"]
 #print(client)
+print(df_merged.shape)
+
+# Drops rows "0"
+df_dropped = df_merged.drop(df_merged[df_merged.eq('0').any(axis=1)].index)
+print(df_dropped.shape)
+
 
 db.testdata.delete_many({})
 
-# Push csv file to MongoDB
+
+#Push csv file to MongoDB
 records = df.keys()
-db.testdata.insert_many(df.to_dict('records'))
-print(db.testdata.find_one())
+db.testdata.insert_many(df_dropped.to_dict('records'))
+#print(db.testdata.find_one())
 
 
+#df.to_csv (r'C:\Digital_Twin\Digital_Twin_Dashboard\amendedData.csv', index = None, header=True) 
+#print('Data has been updated')
 # Close the connection
 conn.close()
