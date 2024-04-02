@@ -64,8 +64,6 @@ db = client["DigitalTwin"]
 # Sort DataFrame by 'NodeId'
 df_dropped = df_merged.sort_values(by=['NodeId','ServerTimeStamp'], ascending=[True, False])
 
-# Get top 5 rows for each unique NodeIds
-df_dropped = df_dropped.groupby('NodeId').head(20)
 
 # Convert 'ServerTimeStamp' and 'SourceTimeStamp' columns to datetime
 columns_to_convert = ['ServerTimeStamp', 'SourceTimeStamp']
