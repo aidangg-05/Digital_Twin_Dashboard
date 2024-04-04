@@ -15,7 +15,7 @@ from routes import routes
 
 # Path to SQLite database file
 database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup8.dxpdb'
-database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
+#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
@@ -61,7 +61,7 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://JunHui:NJHltpbad@cluster0.oiasqth.mongodb.net/')
 # DB name
 db = client["DigitalTwin"]
 
@@ -79,9 +79,6 @@ df_dropped[columns_to_convert] = df_dropped[columns_to_convert].apply(to_datetim
 df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstance(x, str) and is_hex(x) else x)
 
 df_dropped.to_csv('CleanedData.csv', index=False)
-
-# Insert DataFrame records into MongoDB
-db.testdata.insert_many(df_dropped.to_dict('records'))
 
 # Read existing data from MongoDB
 existing_data = list(db.MotorData.find({}, {"_id": 0}))

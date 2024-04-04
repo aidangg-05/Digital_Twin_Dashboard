@@ -7,7 +7,7 @@ app = Flask(__name__)
 routes = Blueprint('routes', __name__)
 
 # Connect to MongoDB
-client = MongoClient('mongodb:// 192.168.200.254:27017/')
+client = MongoClient('mongodb+srv://JunHui:NJHltpbad@cluster0.oiasqth.mongodb.net/')
 db = client["DigitalTwin"]
 
 # Define route for the index page
@@ -28,4 +28,4 @@ def data():
 app.register_blueprint(routes)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80)
