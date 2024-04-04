@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Flask, Blueprint, render_template, jsonify
 from pymongo import MongoClient
+
+app = Flask(__name__)
 
 # Create a Blueprint object for defining routes
 routes = Blueprint('routes', __name__)
@@ -22,3 +24,8 @@ def data():
     for item in data:
         item['_id'] = str(item.get('_id'))  # Convert ObjectId to string
     return jsonify(data)
+
+app.register_blueprint(routes)
+
+if __name__ == '__main__':
+    app.run(debug=True)
