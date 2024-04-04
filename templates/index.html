@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Real-time Data Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <h1>Real-time Data Graph</h1>
+    <canvas id="dataChart" width="400" height="200"></canvas>
+
+    <script>
+      var ctx = document.getElementById("dataChart").getContext("2d");
+      var chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Value",
+              data: [],
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            xAxes: [
+              {
+                type: "time",
+                time: {
+                  unit: "second",
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      function fetchData() {
+        fetch("/data")
+          .then((response) => response.json())
+          .then((data) => {
+            data.forEach((item) => {
+              chart.data.labels.push(item.ServerTimeStamp);
+              chart.data.datasets[0].data.push(item.Value);
+            });
+            chart.update();
+          });
+      }
+
+      // Fetch data initially
+      fetchData();
+
+      // Fetch data every 5 seconds
+      setInterval(fetchData, 5000);
+    </script>
+  </body>
+</html>
