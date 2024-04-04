@@ -11,8 +11,6 @@ import threading
 from routes import routes
 
 
-
-
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
