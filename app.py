@@ -8,8 +8,10 @@ from filetime import to_datetime
 from hex_to_int import is_hex
 from bson import ObjectId
 import threading
+from routes import routes
 
 app = Flask(__name__)
+app.register_blueprint(routes)
 
 
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
@@ -104,3 +106,5 @@ if new_rows_dict:
 # Close the connection
 conn.close()
 
+if __name__ == '__main__':
+    app.run(debug=True)
