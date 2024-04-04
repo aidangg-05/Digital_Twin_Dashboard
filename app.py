@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from filetime import to_datetime
 from hex_to_int import is_hex
 from bson import ObjectId
+import threading
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ app = Flask(__name__)
 
 # Path to SQLite database file
 database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup8.dxpdb'
-#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
+database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
@@ -103,19 +104,3 @@ if new_rows_dict:
 # Close the connection
 conn.close()
 
-@app.route('/')
-def index():
-    return render_template('index.html', data=data)
-
-
-@app.route('/data')
-def data():
-    # Fetch data from MotorData collection in MongoDB
-    data = list(db.MotorData.find({}, {'_id': 0}).sort([('_id', -1)]).limit(10))  # Get last 10 records
-    # Convert ObjectId to string for each document
-    for item in data:
-        item['_id'] = str(item.get('_id'))  # Convert ObjectId to string
-    return jsonify(data)
-
-if __name__ == '__main__':
-    app.run(debug=True)
