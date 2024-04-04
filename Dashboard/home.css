@@ -1,0 +1,50 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding-top:5px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.links {
+    display: flex;
+    justify-content: flex-end;
+    font-family: 'Poppins'
+}
+
+li {
+    padding-right:20px;
+}
+
+#SP{
+    width:30%;
+    padding-left:20px;
+    margin-right:-70px;
+}
+
+#Title {
+    font-family: 'Kanit';
+    font-size: 25px;
+    color:red;
+}
+
+li:hover {
+    color:green;
+    font-weight: bold;
+}
+
+.container-cards {
+    display: flex;
+    margin-top: 50px;
+    padding-top: 5px;
+    justify-content: space-between; 
+    max-width: 80%; 
+    margin: 0 auto; 
+}
+
+
+
