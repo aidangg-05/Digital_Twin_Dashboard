@@ -11,10 +11,11 @@ import threading
 from routes import routes
 
 
+
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
-database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup8.dxpdb'
+database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
 #database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
@@ -61,10 +62,9 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
-client = MongoClient('mongodb+srv://JunHui:NJHltpbad@cluster0.oiasqth.mongodb.net/')
+client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
 # DB name
 db = client["DigitalTwin"]
-
 
 
 # Sort DataFrame by 'NodeId', 'ServerTimeStamp' and drop Null rows

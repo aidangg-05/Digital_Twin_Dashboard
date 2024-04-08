@@ -1,33 +1,7 @@
-# Fetch existing records from MongoDB
-existing_records = db.testdata.find({}, {'_id': 0})
 
-# Extract unique identifiers from existing records
-existing_ids = set(record['unique_id'] for record in existing_records)
-
-# Filter out rows from DataFrame which are already in MongoDB
-new_rows = df_merged[~df_merged['unique_id'].isin(existing_ids)]
-
-# Insert new rows into MongoDB
-if not new_rows.empty:
-    db.testdata.insert_many(new_rows.to_dict('records'))
-   
-# Sort DataFrame by 'NodeId'
-df_dropped = df_merged.sort_values(by=['NodeId','ServerTimeStamp'], ascending=[True, False])
-
-# Get top 5 rows for each unique NodeIds
-df_dropped = df_dropped.groupby('NodeId').head(20)
-
-# Convert 'ServerTimeStamp' and 'SourceTimeStamp' columns to datetime
-columns_to_convert = ['ServerTimeStamp', 'SourceTimeStamp']
-df_dropped[columns_to_convert] = df_dropped[columns_to_convert].apply(to_datetime)
-
-# Apply the conversion function only to hexadecimal strings in the 'value' column
-df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstance(x, str) and is_hex(x) else x)
-
-# Delete existing data in MongoDB collection
-db.testdata.delete_many({})
-
-df_dropped.to_csv('CleanedData.csv', index=False)
-
-# Insert DataFrame records into MongoDB
-db.testdata.insert_many(df_dropped.to_dict('records'))
+Name     : Jun Hui
+Type     : BB-RAW-USD
+Server   : BlueberryMarkets-Demo
+Login    : 19987174
+Password : +lA7OaHl
+Investor : 7lTiQpE-

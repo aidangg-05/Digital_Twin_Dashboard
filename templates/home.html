@@ -1,32 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
+      rel="stylesheet"
+    />
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="home.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='home.css') }}"
+    />
+    <style type="text/css">
+      #canvas-holder {
+        position: absolute;
+        width: 800px;
+        height: 400px;
+      }
+      #myGraph {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
     <section>
-        <nav class="container">
-            <div><img id="SP" src="img/download.png" /></div>
-            <div id="Title">CNC Dashboard</div>
-            <ul class="links">
-                <li>Motor X</li>
-                <li>•</li>
-                <li>Motor Y</li>
-                <li>•</li>
-                <li>Motor Z</li>
-                <li>•</li>
-                <li>Spindle</li>
-            </ul>
-        </nav>
+      <nav class="container">
+        <div>
+          <img
+            id="SP"
+            src="{{ url_for('static', filename='img/download.png') }}"
+          />
+        </div>
+        <div id="Title">CNC Dashboard</div>
+        <ul class="links">
+          <li>Motor X</li>
+          <li>•</li>
+          <li>Motor Y</li>
+          <li>•</li>
+          <li>Motor Z</li>
+          <li>•</li>
+          <li>Spindle</li>
+        </ul>
+      </nav>
     </section>
 
+    <section>
+      <h1>Real-time Data Graph</h1>
+      <div id="canvas-holder">
+        <canvas id="myGraph"></canvas>
+      </div>
 
+      <script>
+        var ctx = document.getElementById("myGraph").getContext("2d");
+        var chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: "Value",
+                data: [],
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              xAxes: [
+                {
+                  type: "time",
+                  time: {
+                    unit: "second",
+                  },
+                },
+              ],
+            },
+          },
+        });
+
+        function fetchData() {
+          fetch("/data")
+            .then((response) => response.json())
+            .then((data) => {
+              data.forEach((item) => {
+                chart.data.labels.push(item.ServerTimeStamp);
+                chart.data.datasets[0].data.push(item.Value);
+              });
+              chart.update();
+            });
+        }
+
+        // Fetch data initially
+        fetchData();
+
+        // Fetch data every 5 seconds
+        setInterval(fetchData, 5000);
+      </script>
+    </section>
     <script src="index.js"></script>
-</body>
+  </body>
 </html>
