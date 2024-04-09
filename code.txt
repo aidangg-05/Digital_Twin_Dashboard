@@ -1,7 +1,0 @@
-
-Name     : Jun Hui
-Type     : BB-RAW-USD
-Server   : BlueberryMarkets-Demo
-Login    : 19987174
-Password : +lA7OaHl
-Investor : 7lTiQpE-
