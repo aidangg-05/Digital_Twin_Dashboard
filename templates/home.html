@@ -137,6 +137,33 @@
       </div>
     </section>
 
+    <section class="graph-container">
+      <div class="graph">
+        <h1>Cycle Count</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph13"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Droop</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph14"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Gain</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph15"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Load</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph16"></canvas>
+        </div>
+      </div>
+    </section>
+
     <script>
       var charts = [];
       var graphIds = [
@@ -152,6 +179,10 @@
         "myGraph10",
         "myGraph11",
         "myGraph12",
+        "myGraph13",
+        "myGraph14",
+        "myGraph15",
+        "myGraph16",
       ];
       var maxDataPoints = 10; // Define the maximum number of data points to display
 
@@ -203,7 +234,9 @@
 
       function fetchData() {
         // Define node keys to fetch data for
-        var nodeKeys = [1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15]; // Example node keys
+        var nodeKeys = [
+          1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
+        ]; // Example node keys
 
         // Fetch data for each node key
         nodeKeys.forEach(function (key, index) {
