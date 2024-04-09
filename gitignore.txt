@@ -1,1 +1,1 @@
-C:\Digital_Twin\Digital_Twin_Dashboard\venv
+C:\Digital_Twin\Digital_Twin_Dashboard\venv\
