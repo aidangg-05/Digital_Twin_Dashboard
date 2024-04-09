@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, jsonify
+from flask import Flask, Blueprint, render_template, jsonify, request
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -20,13 +20,16 @@ def index():
 # Define route for fetching data
 @routes.route('/data')
 def data():
-    # Fetch data from MotorData collection in MongoDB
-    data = list(db.MotorData.find({}, {'_id': 0}).sort([('_id', -1)]).limit(10))  # Get last 10 records
-    print("Data found")
-    # Convert ObjectId to string for each document
-    for item in data:
-        item['_id'] = str(item.get('_id'))  # Convert ObjectId to string
-    return jsonify(data)
+    # Get node keys from query parameters
+    node_keys = request.args.getlist('NodeKey')
+    data_dict = {}
+
+    # Fetch data from MotorData collection in MongoDB for each node key
+    for key in node_keys:
+        data = list(db.MotorData.find({'NodeKey': int(key)}, {'_id': 0}).sort([('_id', -1)]).limit(1))
+        data_dict[key] = data[0] if data else None
+
+    return jsonify(data_dict)
 
 app.register_blueprint(routes)
 

@@ -18,12 +18,17 @@
       href="{{ url_for('static', filename='home.css') }}"
     />
     <style type="text/css">
-      #canvas-holder {
-        position: absolute;
-        width: 800px;
-        height: 400px;
+      .graph-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
       }
-      #myGraph {
+      .graph {
+        width: calc(50% - 10px); /* Adjust width to 50% minus margin */
+        margin-bottom: 20px; /* Add some margin between rows */
+      }
+      .graph canvas {
         width: 100%;
         height: 100%;
       }
@@ -51,14 +56,107 @@
       </nav>
     </section>
 
-    <section>
-      <h1>Real-time Data Graph</h1>
-      <div id="canvas-holder">
-        <canvas id="myGraph"></canvas>
+    <section class="graph-container">
+      <div class="graph">
+        <h1>Current</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph1"></canvas>
+        </div>
       </div>
+      <div class="graph">
+        <h1>MaxCurrent</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph2"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Cycle Count</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph3"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>ScaPos1</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph4"></canvas>
+        </div>
+      </div>
+    </section>
 
-      <script>
-        var ctx = document.getElementById("myGraph").getContext("2d");
+    <section class="graph-container">
+      <div class="graph">
+        <h1>Current</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph5"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>MaxCurrent</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph6"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Cycle Count</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph7"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>ScaPos2</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph8"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="graph-container">
+      <div class="graph">
+        <h1>Current</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph9"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>MaxCurrent</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph10"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Cycle Count</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph11"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>ScaPos3</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph12"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      var charts = [];
+      var graphIds = [
+        "myGraph1",
+        "myGraph2",
+        "myGraph3",
+        "myGraph4",
+        "myGraph5",
+        "myGraph6",
+        "myGraph7",
+        "myGraph8",
+        "myGraph9",
+        "myGraph10",
+        "myGraph11",
+        "myGraph12",
+      ];
+      var maxDataPoints = 10; // Define the maximum number of data points to display
+
+      graphIds.forEach(function (graphId) {
+        var ctx = document.getElementById(graphId).getContext("2d");
         var chart = new Chart(ctx, {
           type: "line",
           data: {
@@ -82,32 +180,62 @@
                   type: "time",
                   time: {
                     unit: "second",
+                    displayFormats: {
+                      second: "h:mm:ss", // Customize datetime format here
+                    },
                   },
+                  ticks: {
+                    maxTicksLimit: 50, // Adjust maximum number of ticks as needed
+                  },
+                },
+              ],
+              yAxes: [
+                {
+                  // Add options for the y-axis if needed
                 },
               ],
             },
           },
         });
 
-        function fetchData() {
-          fetch("/data")
+        charts.push(chart);
+      });
+
+      function fetchData() {
+        // Define node keys to fetch data for
+        var nodeKeys = [1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15]; // Example node keys
+
+        // Fetch data for each node key
+        nodeKeys.forEach(function (key, index) {
+          fetch("/data?NodeKey=" + key) // Use NodeKey as the query parameter
             .then((response) => response.json())
             .then((data) => {
-              data.forEach((item) => {
-                chart.data.labels.push(item.ServerTimeStamp);
-                chart.data.datasets[0].data.push(item.Value);
-              });
-              chart.update();
+              if (data[key]) {
+                // Check if data for the current key exists
+                // Update chart data with received data
+                charts[index].data.labels.push(data[key].ServerTimeStamp);
+                charts[index].data.datasets[0].data.push(data[key].Value);
+
+                // Limit the number of data points displayed
+                if (charts[index].data.labels.length > maxDataPoints) {
+                  charts[index].data.labels.shift(); // Remove the oldest label
+                  charts[index].data.datasets[0].data.shift(); // Remove the oldest data point
+                }
+
+                // Update chart
+                charts[index].update();
+              }
             });
-        }
+        });
+      }
 
-        // Fetch data initially
-        fetchData();
+      // Fetch data initially
+      fetchData();
 
-        // Fetch data every 5 seconds
-        setInterval(fetchData, 5000);
-      </script>
-    </section>
+      // Fetch data every 3 seconds
+      setInterval(fetchData, 3000);
+    </script>
+
     <script src="index.js"></script>
   </body>
 </html>
