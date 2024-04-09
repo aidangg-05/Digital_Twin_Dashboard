@@ -1,7 +1,12 @@
-.container {
+.nav-container {
     display: flex;
     justify-content: space-between;
-    padding-top:5px;
+    padding-top:10px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white; /* Change this to the desired background color */
+    z-index: 1000; /* Ensure it's above other content */
 }
 
 ul {
@@ -46,6 +51,8 @@ li:hover {
     margin: 0 auto; 
 }
 
-
+.monkey {
+    margin-top:50px
+}
 
 
