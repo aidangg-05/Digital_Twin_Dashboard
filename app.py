@@ -9,28 +9,19 @@ from hex_to_int import is_hex
 from bson import ObjectId
 import threading
 from routes import routes
-
+import pymongo
 
 
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
 # Path to SQLite database file
-database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup5.dxpdb'
-#database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
+#database_file = r'C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup8.dxpdb'
+database_file = r'c:\Program Files (x86)\TAKEBISHI\DeviceXPlorer OPC Server 7\Bin\HistoricalGroup5.dxpdb'
 
 conn = sqlite3.connect(database_file)
 c = conn.cursor()
 
 conn= sqlite3.connect(database_file)
-
-def column_exists(table_name, column_name):
-    # Check if the column exists in the table
-    c.execute(f"PRAGMA table_info({table_name})")
-    columns = c.fetchall()
-    for col in columns:
-        if col[1] == column_name:
-            return True
-    return False
 
 def delete_merged_table():
     c.execute('DROP TABLE IF EXISTS MergedData')
@@ -65,7 +56,9 @@ print("Number of rows in MergedData.csv:", num_rows)
 client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
 # DB name
 db = client["DigitalTwin"]
+collection = db["MotorData"]
 
+print("debug1")
 
 # Sort DataFrame by 'NodeId', 'ServerTimeStamp' and drop Null rows
 df_dropped = df_merged.sort_values(by=['NodeId','ServerTimeStamp'], ascending=[True, False])
@@ -80,6 +73,23 @@ df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstan
 
 df_dropped.to_csv('CleanedData.csv', index=False)
 
+
+print("debug2")
+
+def delete_oldest_records():
+    # Count the total number of records
+    total_records = collection.count_documents({})
+
+    # If there are more than 1500 records, delete the oldest 500
+    if total_records > 1500:
+        oldest_records = collection.find({}, {"_id": 1}).sort([("_id", pymongo.ASCENDING)]).limit(500)
+        oldest_ids = [record["_id"] for record in oldest_records]
+        collection.delete_many({"_id": {"$in": oldest_ids}})
+        print("Oldest 500 records deleted.")
+
+# Call the function to delete oldest records whenever there are 1500 records
+delete_oldest_records()
+
 # Read existing data from MongoDB
 existing_data = list(db.MotorData.find({}, {"_id": 0}))
 
@@ -92,11 +102,18 @@ new_rows = df_dropped[~df_dropped.apply(tuple, axis=1).isin(df_existing.apply(tu
 # Convert new rows to dictionary format
 new_rows_dict = new_rows.to_dict('records')
 
+
+print("debug3")
+
+
 # Insert new rows into MongoDB
 if new_rows_dict:
     db.MotorData.insert_many(new_rows_dict)
     print("New rows added to MongoDB.")
 
+
+print("debug4")
+
+
 # Close the connection
 conn.close()
-
