@@ -11,11 +11,14 @@ def to_datetime(series: pd.Series) -> pd.Series:
 	datetime object is timezone-naive but is equivalent to tzinfo=utc.
 	"""
 	def convert(filetime):
-		# Get seconds and remainder in terms of Unix epoch
-		s, ns100 = divmod(filetime - EPOCH_AS_FILETIME, HUNDREDS_OF_NS)
-		# Convert to datetime object, with remainder as microseconds.
-		utc = datetime.utcfromtimestamp(s).replace(microsecond=(ns100 // 10))
-		offset = timedelta(hours=8)
-		return (utc + offset)
-		
-	return series.apply(convert)
+        # Get seconds and remainder in terms of Unix epoch
+        s, ns100 = divmod(filetime - EPOCH_AS_FILETIME, HUNDREDS_OF_NS)
+        # Convert to datetime object, with remainder as microseconds.
+        utc = datetime.utcfromtimestamp(s).replace(microsecond=(ns100 // 10))
+        offset = timedelta(hours=8)
+        local_time = utc + offset
+        # Format the datetime to only show date and time without the year
+        formatted_time = local_time.strftime("%d %B %H:%M:%S")  # Example format: "9th April 12:34:56"
+        return formatted_time
+
+    return series.apply(convert)
