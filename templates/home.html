@@ -140,6 +140,33 @@
       </div>
     </section>
 
+    <section class="graph-container">
+      <div class="graph">
+        <h1>Cycle Count</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph13"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Droop</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph14"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Gain</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph15"></canvas>
+        </div>
+      </div>
+      <div class="graph">
+        <h1>Load</h1>
+        <div class="canvas-holder">
+          <canvas id="myGraph16"></canvas>
+        </div>
+      </div>
+    </section>
+
     <script>
       var charts = [];
       var graphIds = [
@@ -155,11 +182,26 @@
         "myGraph10",
         "myGraph11",
         "myGraph12",
+        "myGraph13",
+        "myGraph14",
+        "myGraph15",
+        "myGraph16",
       ];
       var maxDataPoints = 10; // Define the maximum number of data points to display
 
-      graphIds.forEach(function (graphId) {
+      // Define colors for each set of graphs
+      var colors = [
+        "rgba(255, 99, 132, 1)", // Red
+        "rgba(54, 162, 235, 1)", // Dark Blue
+        "rgba(75, 192, 192, 1)", // Dark Green
+        "rgba(153, 102, 255, 1)", // Dark Purple
+      ];
+
+      graphIds.forEach(function (graphId, index) {
         var ctx = document.getElementById(graphId).getContext("2d");
+        var colorIndex = Math.floor(index / 4); // Determine which set of colors to use
+        var color = colors[colorIndex]; // Assign color based on the set
+
         var chart = new Chart(ctx, {
           type: "line",
           data: {
@@ -168,8 +210,8 @@
               {
                 label: "Value",
                 data: [],
-                backgroundColor: "rgba(255, 99, 132, 0.2)",
-                borderColor: "rgba(255, 99, 132, 1)",
+                backgroundColor: color,
+                borderColor: color,
                 borderWidth: 1,
               },
             ],
@@ -206,7 +248,9 @@
 
       function fetchData() {
         // Define node keys to fetch data for
-        var nodeKeys = [1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15]; // Example node keys
+        var nodeKeys = [
+          1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
+        ]; // Example node keys
 
         // Fetch data for each node key
         nodeKeys.forEach(function (key, index) {
