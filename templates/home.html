@@ -42,14 +42,7 @@
             id="SP"
             src="{{ url_for('static', filename='img/download.png') }}"
           />
-          <div class="theme-toggle">
-            <label class="switch">
-              <input type="checkbox" id="btn" onchange="myFunction()" />
-              <span class="slider round"></span>
-            </label>
-          </div>
         </div>
-
         <div id="Title">CNC Dashboard</div>
         <ul class="links">
           <li><a href="#Motor_x">Motor X</a></li>
@@ -58,7 +51,9 @@
           <li>•</li>
           <li><a href="#Motor_z">Motor Z</a></li>
           <li>•</li>
-          <li><a href="#spindle">Spindle</a></li>
+          <li><a href="#">Spindle</a></li>
+          <li>•</li>
+          <li><a href="#">Settings</a></li>
         </ul>
       </div>
     </section>
@@ -66,25 +61,25 @@
     <h1 id="Motor_x" class="heading">Motor X</h1>
     <section class="graph-container monkey">
       <div class="graph">
-        <h1 class="heading">Current</h1>
+        <h1>Current</h1>
         <div class="canvas-holder">
           <canvas id="myGraph1"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">MaxCurrent</h1>
+        <h1>MaxCurrent</h1>
         <div class="canvas-holder">
           <canvas id="myGraph2"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Cycle Count</h1>
+        <h1>Cycle Count</h1>
         <div class="canvas-holder">
           <canvas id="myGraph3"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">ScaPos1</h1>
+        <h1>ScaPos1</h1>
         <div class="canvas-holder">
           <canvas id="myGraph4"></canvas>
         </div>
@@ -94,25 +89,25 @@
     <h1 id="Motor_y" class="heading">Motor Y</h1>
     <section class="graph-container">
       <div class="graph">
-        <h1 class="heading">Current</h1>
+        <h1>Current</h1>
         <div class="canvas-holder">
           <canvas id="myGraph5"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">MaxCurrent</h1>
+        <h1>MaxCurrent</h1>
         <div class="canvas-holder">
           <canvas id="myGraph6"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Cycle Count</h1>
+        <h1>Cycle Count</h1>
         <div class="canvas-holder">
           <canvas id="myGraph7"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">ScaPos2</h1>
+        <h1>ScaPos2</h1>
         <div class="canvas-holder">
           <canvas id="myGraph8"></canvas>
         </div>
@@ -122,53 +117,52 @@
     <h1 id="Motor_z" class="heading">Motor Z</h1>
     <section class="graph-container">
       <div class="graph">
-        <h1 class="heading">Current</h1>
+        <h1>Current</h1>
         <div class="canvas-holder">
           <canvas id="myGraph9"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">MaxCurrent</h1>
+        <h1>MaxCurrent</h1>
         <div class="canvas-holder">
           <canvas id="myGraph10"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Cycle Count</h1>
+        <h1>Cycle Count</h1>
         <div class="canvas-holder">
           <canvas id="myGraph11"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">ScaPos3</h1>
+        <h1>ScaPos3</h1>
         <div class="canvas-holder">
           <canvas id="myGraph12"></canvas>
         </div>
       </div>
     </section>
 
-    <h1 id="spindle" class="heading">Spindle</h1>
     <section class="graph-container">
       <div class="graph">
-        <h1 class="heading">Cycle Count</h1>
+        <h1>Cycle Count</h1>
         <div class="canvas-holder">
           <canvas id="myGraph13"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Droop</h1>
+        <h1>Droop</h1>
         <div class="canvas-holder">
           <canvas id="myGraph14"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Gain</h1>
+        <h1>Gain</h1>
         <div class="canvas-holder">
           <canvas id="myGraph15"></canvas>
         </div>
       </div>
       <div class="graph">
-        <h1 class="heading">Load</h1>
+        <h1>Load</h1>
         <div class="canvas-holder">
           <canvas id="myGraph16"></canvas>
         </div>
@@ -242,11 +236,9 @@
                   type: "time",
                   time: {
                     unit: "second",
-                    parser: "HH:mm:ss", // Explicitly specify the datetime format
                     displayFormats: {
                       second: "h:mm:ss", // Customize datetime format here
                     },
-                    tooltipFormat: "h:mm:ss", // Customize tooltip format
                   },
                   ticks: {
                     maxTicksLimit: 50, // Adjust maximum number of ticks as needed
