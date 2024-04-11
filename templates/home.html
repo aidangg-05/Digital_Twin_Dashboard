@@ -53,10 +53,17 @@
           <li>•</li>
           <li><a href="#">Spindle</a></li>
           <li>•</li>
-          <li><a href="#">Settings</a></li>
+          <li><a href="#" onclick="openSettings()">Settings</a></li>
         </ul>
       </div>
     </section>
+
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSettings()">&times;</span>
+        <h2>Settings</h2>
+      </div>
+    </div>
 
     <h1 id="Motor_x" class="heading">Motor X</h1>
     <section class="graph-container monkey">
@@ -169,15 +176,25 @@
       </div>
     </section>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const themeToggle = document.getElementById("themeToggle");
-        themeToggle.addEventListener("change", toggleTheme);
-      });
-
-      function toggleTheme() {
-        const body = document.body;
-        body.classList.toggle("dark-mode");
+      // Function to open the settings modal
+      function openSettings() {
+        var modal = document.getElementById("settingsModal");
+        modal.style.display = "block";
       }
+
+      // Function to close the settings modal
+      function closeSettings() {
+        var modal = document.getElementById("settingsModal");
+        modal.style.display = "none";
+      }
+
+      // Close the modal if the user clicks outside of it
+      window.onclick = function (event) {
+        var modal = document.getElementById("settingsModal");
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
 
       var charts = [];
       var graphIds = [
