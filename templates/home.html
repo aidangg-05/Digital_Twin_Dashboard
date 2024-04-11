@@ -186,8 +186,19 @@
       ];
       var maxDataPoints = 10; // Define the maximum number of data points to display
 
-      graphIds.forEach(function (graphId) {
+      // Define colors for each set of graphs
+      var colors = [
+        "rgba(255, 99, 132, 1)", // Red
+        "rgba(54, 162, 235, 1)", // Dark Blue
+        "rgba(75, 192, 192, 1)", // Dark Green
+        "rgba(153, 102, 255, 1)", // Dark Purple
+      ];
+
+      graphIds.forEach(function (graphId, index) {
         var ctx = document.getElementById(graphId).getContext("2d");
+        var colorIndex = Math.floor(index / 4); // Determine which set of colors to use
+        var color = colors[colorIndex]; // Assign color based on the set
+
         var chart = new Chart(ctx, {
           type: "line",
           data: {
@@ -196,8 +207,8 @@
               {
                 label: "Value",
                 data: [],
-                backgroundColor: "rgba(255, 99, 132, 0.2)",
-                borderColor: "rgba(255, 99, 132, 1)",
+                backgroundColor: color,
+                borderColor: color,
                 borderWidth: 1,
               },
             ],
