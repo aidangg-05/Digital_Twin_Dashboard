@@ -56,8 +56,11 @@
           <li><a href="#" onclick="openSettings()">Settings</a></li>
         </ul>
       </div>
-    </section>
-
+    <div class="overlay">
+      <div id="notificationBox">
+          <p id="emergency-text">Emergency Stop Activated!</p>
+      </div>
+    </div>
     <div id="settingsModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeSettings()">&times;</span>
@@ -305,43 +308,70 @@
       });
 
       function fetchData() {
-        // Define node keys to fetch data for
-        var nodeKeys = [
-          1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
-        ]; // Example node keys
+    // Define node keys to fetch data for
+    var nodeKeys = [
+        1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
+    ]; // Example node keys
 
-        // Fetch data for each node key
-        nodeKeys.forEach(function (key, index) {
-          fetch("/data?NodeKey=" + key) // Use NodeKey as the query parameter
+    // Fetch data for each node key
+    nodeKeys.forEach(function (key, index) {
+        fetch("/data?NodeKey=" + key)
             .then((response) => response.json())
             .then((data) => {
-              if (data[key]) {
-                // Check if data for the current key exists
-                // Update chart data with received data
-                charts[index].data.labels.push(data[key].ServerTimeStamp);
-                charts[index].data.datasets[0].data.push(data[key].Value);
+                if (data[key]) {
+                    charts[index].data.labels.push(data[key].ServerTimeStamp);
+                    charts[index].data.datasets[0].data.push(data[key].Value);
 
-                // Limit the number of data points displayed
-                if (charts[index].data.labels.length > maxDataPoints) {
-                  charts[index].data.labels.shift(); // Remove the oldest label
-                  charts[index].data.datasets[0].data.shift(); // Remove the oldest data point
+                    if (charts[index].data.labels.length > maxDataPoints) {
+                        charts[index].data.labels.shift();
+                        charts[index].data.datasets[0].data.shift();
+                    }
+
+                    charts[index].update();
                 }
+            })
+            .catch(error => console.error("Error fetching data:", error)); // Handle errors
+    });
+}
 
-                // Update chart
-                charts[index].update();
-                function toggleTheme() {
-                  document.body.classList.toggle("dark-mode");
-                }
-              }
-            });
-        });
-      }
+function EmergencyStop() {
+    fetch("/data?NodeKey=74")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data[74] && data[74].Value === 128) {
+                showBox();
+            } else if (data[74] && data[74].Value === 0) {
+                hideBox();
+            }
+            if (data[74]) {
+                console.log("Value of NodeKey 74:", data[74].Value);
+            }
+        })
+        .catch(error => console.error("Error fetching data for NodeKey 74:", error)); // Handle errors
+}
 
-      // Fetch data initially
-      fetchData();
+function showBox() {
+    var box = document.getElementById("notificationBox");
+    var overlay = document.querySelector(".overlay");
+    box.style.display = "block";
+    overlay.classList.add("active"); // Add the active class to the overlay
+}
 
-      // Fetch data every 3 seconds
-      setInterval(fetchData, 3000);
+function hideBox() {
+    var box = document.getElementById("notificationBox");
+    var overlay = document.querySelector(".overlay");
+    box.style.display = "none";
+    overlay.classList.remove("active"); // Remove the active class from the overlay
+}
+
+// Fetch data initially
+fetchData();
+EmergencyStop();
+
+// Fetch data every 3 seconds
+setInterval(fetchData, 3000);
+setInterval(EmergencyStop, 3000);
+
     </script>
 
     <script src="index.js"></script>
