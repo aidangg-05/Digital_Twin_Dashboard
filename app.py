@@ -31,11 +31,23 @@ def delete_merged_table():
 
 delete_merged_table()
 
+#def merged():
+    #c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT * FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
+    #conn.commit()  
+    #print("Tables merged successfully!")
+    
 def merged():
-    c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT * FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
+    c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT *, \
+                CASE \
+                    WHEN Value = "," THEN 0 \
+                    WHEN Value LIKE "%,No operation mode%" THEN "No operation mode" \
+                    WHEN Value LIKE "%,Emergency stop%" THEN "Emergency stop" \
+                    ELSE Value \
+                END AS ProcessedValue \
+                FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
     conn.commit()  
     print("Tables merged successfully!")
-    
+
 
 merged()
 
@@ -59,6 +71,7 @@ db = client["DigitalTwin"]
 collection = db["MotorData"]
 
 print("debug1")
+
 
 # Sort DataFrame by 'NodeId', 'ServerTimeStamp' and drop Null rows
 df_dropped = df_merged.sort_values(by=['NodeId','ServerTimeStamp'], ascending=[True, False])
