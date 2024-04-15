@@ -68,6 +68,10 @@
           id="darkModeCheckbox"
           onchange="toggleDarkMode()"
         />
+        <br />
+        <button class="download-button" onclick="downloadMongoDBDataCSV()">
+          Download Data
+        </button>
       </div>
     </div>
 
@@ -215,6 +219,9 @@
           body.classList.remove("dark-mode");
           spImage.src = "{{ url_for('static', filename='img/download.png') }}"; // Update source for light mode
         }
+      }
+      function downloadMongoDBDataCSV() {
+        window.location.href = "/download_database_csv";
       }
 
       var charts = [];

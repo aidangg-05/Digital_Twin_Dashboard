@@ -9,7 +9,7 @@ from hex_to_int import is_hex
 from bson import ObjectId
 import threading
 from routes import routes
-import pymongo
+
 
 
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
