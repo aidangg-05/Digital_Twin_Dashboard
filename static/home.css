@@ -142,3 +142,40 @@ a {
     color: #fff; /* Change link color to white */
   }
   
+
+  #notificationBox {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%; /* Adjust width as needed */
+    max-width: 500px; /* Maximum width for responsiveness */
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.overlay {
+  position: fixed;
+  z-index: 1001; /* Ensure it's above other content */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: none; /* Hidden by default */
+}
+
+.overlay.active {
+  display: block; /* Show when notification box is active */
+}
+
+#emergency-text {
+  color:red;
+  text-align: center;
+  font-size:20px;
+  font-weight: bold;
+}
