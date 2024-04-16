@@ -71,6 +71,10 @@
           id="darkModeCheckbox"
           onchange="toggleDarkMode()"
         />
+        <br />
+        <button class="download-button" onclick="downloadMongoDBDataCSV()">
+          Download Data
+        </button>
       </div>
     </div>
 
@@ -219,6 +223,9 @@
           spImage.src = "{{ url_for('static', filename='img/download.png') }}"; // Update source for light mode
         }
       }
+      function downloadMongoDBDataCSV() {
+        window.location.href = "/download_database_csv";
+      }
 
       var charts = [];
       var graphIds = [
@@ -300,7 +307,10 @@
         charts.push(chart);
       });
 
-      function fetchData() {
+      // Define an object to store the last timestamp for each chart
+let lastTimestamps = {};
+
+function fetchData() {
     // Define node keys to fetch data for
     var nodeKeys = [
         1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
@@ -312,40 +322,44 @@
             .then((response) => response.json())
             .then((data) => {
                 if (data[key]) {
-                    charts[index].data.labels.push(data[key].ServerTimeStamp);
-                    charts[index].data.datasets[0].data.push(data[key].Value);
+                    // Check if the timestamp is different from the last one
+                    if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
+                        charts[index].data.labels.push(data[key].ServerTimeStamp);
+                        charts[index].data.datasets[0].data.push(data[key].Value);
 
-                    if (charts[index].data.labels.length > maxDataPoints) {
-                        charts[index].data.labels.shift();
-                        charts[index].data.datasets[0].data.shift();
+                        if (charts[index].data.labels.length > maxDataPoints) {
+                            charts[index].data.labels.shift();
+                            charts[index].data.datasets[0].data.shift();
+                        }
+
+                        charts[index].update();
+
+                        // Update the last timestamp for this chart
+                        lastTimestamps[key] = data[key].ServerTimeStamp;
+                    } else {
+                        console.log("Timestamp is the same as before, skipping chart update.");
                     }
-
-                    charts[index].update();
                 }
             })
             .catch(error => console.error("Error fetching data:", error)); // Handle errors
     });
 }
 
-function errorLog(nodeKey, value1, value2) {
-    // Check if nodeKey is a valid integer
-    if (Number.isInteger(nodeKey)) {
-        fetch("/data?NodeKey=" + nodeKey + "&value1=" + value1 + "&value2=" + value2)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data[nodeKey] && data[nodeKey].Value === value1) {
-                    showBox();
-                } else if (data[nodeKey] && data[nodeKey].Value === value2) {
-                    hideBox();
-                }
-                if (data[nodeKey]) {
-                    console.log("Value of NodeKey " + nodeKey + ":", data[nodeKey].Value);
-                }
-            })
-            .catch(error => console.error("Error fetching data for NodeKey " + nodeKey + ":", error)); // Handle errors
-    } else {
-        console.error("Invalid NodeKey:", nodeKey);
-    }
+
+function EmergencyStop() {
+    fetch("/data?NodeKey=74")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data[74] && data[74].Value === 128) {
+                showBox();
+            } else if (data[74] && data[74].Value === 0) {
+                hideBox();
+            }
+            if (data[74]) {
+                console.log("Value of NodeKey 74:", data[74].Value);
+            }
+        })
+        .catch(error => console.error("Error fetching data for NodeKey 74:", error)); // Handle errors
 }
 
 

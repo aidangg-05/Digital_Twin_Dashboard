@@ -1,5 +1,7 @@
-from flask import Flask, Blueprint, render_template, jsonify, request
+from flask import Flask, Blueprint, render_template, jsonify, request, send_file
 from pymongo import MongoClient
+import csv
+
 
 app = Flask(__name__)
 
@@ -26,10 +28,19 @@ def data():
 
     # Fetch data from MotorData collection in MongoDB for each node key
     for key in node_keys:
-        data = list(db.MotorData.find({'NodeKey': int(key)}, {'_id': 0}).sort([('_id', -1)]).limit(1))
+        data = list(db.MotorData.find({'NodeKey': int(key)}, {'_id': 0}).sort([('ServerTimeStamp', -1)]).limit(1))
         data_dict[key] = data[0] if data else None
 
     return jsonify(data_dict)
+
+@routes.route('/download_database_csv')
+def download_database_csv():
+    
+    csv_file_path = 'CleanedData.csv'
+
+    # Send the CSV file as a response for download
+    return send_file(csv_file_path, as_attachment=True)
+
 
 app.register_blueprint(routes)
 

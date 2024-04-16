@@ -6,11 +6,11 @@ EPOCH_AS_FILETIME = 116444736000000000  # January 1, 1970 as filetime
 HUNDREDS_OF_NS = 10000000
 
 def to_datetime(series: pd.Series) -> pd.Series:
-	"""
-	Converts a Windows filetime number to a Python datetime. The new
-	datetime object is timezone-naive but is equivalent to tzinfo=utc.
-	"""
-	def convert(filetime):
+    """
+    Converts a Windows filetime number to a Python datetime. The new
+    datetime object is timezone-naive but is equivalent to tzinfo=utc.
+    """
+    def convert(filetime):
         # Get seconds and remainder in terms of Unix epoch
         s, ns100 = divmod(filetime - EPOCH_AS_FILETIME, HUNDREDS_OF_NS)
         # Convert to datetime object, with remainder as microseconds.
