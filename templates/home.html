@@ -365,17 +365,23 @@ function hideBox() {
 
 // Fetch data initially
 fetchData();
-errorLog(74, 128, 0);
+errorLog(47, "EMG Emergency stop EXIN", "EMG Emergency stop SRV");
 
 // Fetch data every 3 seconds
 setInterval(fetchData, 3000);
 
 setInterval(() => {
-    errorLog(74, 128, 0);
-}, 3000); // 3000 milliseconds = 5 second
+    errorLog(47, "EMG Emergency stop EXIN", "EMG Emergency stop SRV");
+}, 3000); 
+
 
     </script>
 
     <script src="index.js"></script>
   </body>
 </html>
+
+
+
+
+
