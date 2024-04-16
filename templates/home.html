@@ -307,7 +307,10 @@
         charts.push(chart);
       });
 
-      function fetchData() {
+      // Define an object to store the last timestamp for each chart
+let lastTimestamps = {};
+
+function fetchData() {
     // Define node keys to fetch data for
     var nodeKeys = [
         1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
@@ -319,20 +322,29 @@
             .then((response) => response.json())
             .then((data) => {
                 if (data[key]) {
-                    charts[index].data.labels.push(data[key].ServerTimeStamp);
-                    charts[index].data.datasets[0].data.push(data[key].Value);
+                    // Check if the timestamp is different from the last one
+                    if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
+                        charts[index].data.labels.push(data[key].ServerTimeStamp);
+                        charts[index].data.datasets[0].data.push(data[key].Value);
 
-                    if (charts[index].data.labels.length > maxDataPoints) {
-                        charts[index].data.labels.shift();
-                        charts[index].data.datasets[0].data.shift();
+                        if (charts[index].data.labels.length > maxDataPoints) {
+                            charts[index].data.labels.shift();
+                            charts[index].data.datasets[0].data.shift();
+                        }
+
+                        charts[index].update();
+
+                        // Update the last timestamp for this chart
+                        lastTimestamps[key] = data[key].ServerTimeStamp;
+                    } else {
+                        console.log("Timestamp is the same as before, skipping chart update.");
                     }
-
-                    charts[index].update();
                 }
             })
             .catch(error => console.error("Error fetching data:", error)); // Handle errors
     });
 }
+
 
 function EmergencyStop() {
     fetch("/data?NodeKey=74")
