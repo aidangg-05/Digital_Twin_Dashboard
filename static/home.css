@@ -1,3 +1,8 @@
+body {
+    font-family: 'Poppins';
+}
+
+
 .nav-container {
     display: flex;
     justify-content: space-between;
@@ -9,9 +14,6 @@
     z-index: 1000; /* Ensure it's above other content */
 }
 
-  .theme-toggle .slider.round {
-    margin-right: 5px; /* Adjust this value as needed */
-  }
 
 ul {
     list-style-type: none;
@@ -34,83 +36,20 @@ li {
     padding-left:20px;
     margin-right:-70px;
 }
+
+.dark-mode #SP{
+    width:30%;
+    padding-left:20px;
+    margin-right:-70px;
+}
+
 #Title {
     font-family: 'Kanit';
     font-size: 25px;
     color:red;
+    margin-right:-120px;
 }
-.page {
-    display:inline;
-    background:#FFF;
-    color: #121212;
-    font-size: 25px;
-  }
-  
-  .dark-mode,
-  .dark-mode .page {
-    background-color:#202020;
-    color: #FFF;
-  }
 
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-  }
-  
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(20px);
-    -ms-transform: translateX(20px);
-    transform: translateX(20px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 20px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
 
 a:hover {
     color:green;
@@ -142,3 +81,119 @@ a {
     margin-top:70px;
 }
 
+/* CSS styles for modal popup */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+  }
+  
+  .modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Styles for the dark mode */
+.dark-mode {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .dark-mode .modal-content {
+    background-color: #444;
+    border-color: #888;
+    color: #fff;
+  }
+  
+  .dark-mode label {
+    color: #fff;
+  }
+
+  /* Styles for the nav bar in dark mode */
+.dark-mode .nav-container {
+    background-color: #333; /* Change to black */
+    color: #fff; /* Change text color to white */
+  }
+  
+  .dark-mode .links a {
+    color: #fff; /* Change link color to white */
+  }
+  
+
+  #notificationBox {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%; /* Adjust width as needed */
+    max-width: 500px; /* Maximum width for responsiveness */
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.overlay {
+  position: fixed;
+  z-index: 1001; /* Ensure it's above other content */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: none; /* Hidden by default */
+}
+
+.overlay.active {
+  display: block; /* Show when notification box is active */
+}
+
+#emergency-text {
+  color:red;
+  text-align: center;
+  font-size:20px;
+  font-weight: bold;
+}
+
+  .download-button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  .download-button:hover {
+    background-color: #45a049;
+  }

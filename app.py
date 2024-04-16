@@ -36,7 +36,7 @@ def merged():
     c.execute('CREATE TABLE IF NOT EXISTS MergedData AS SELECT * FROM HistoricalData t1 INNER JOIN NodeIdKey t2 ON t1.NodeKey = t2.NodeKey')
     conn.commit()  
     print("Tables merged successfully!")
-
+    
 merged()
 
 
@@ -59,6 +59,7 @@ db = client["DigitalTwin"]
 collection = db["MotorData"]
 
 print("debug1")
+
 
 
 # Sort DataFrame by 'NodeId', 'ServerTimeStamp' and drop Null rows
