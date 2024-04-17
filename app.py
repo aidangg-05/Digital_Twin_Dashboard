@@ -77,6 +77,7 @@ df_dropped['Value'] = df_dropped['Value'].apply(lambda x: int(x, 16) if isinstan
 # Remove unwanted commas and whitespaces
 df_dropped['Value'] = df_dropped['Value'].apply(lambda x: ', '.join(re.findall(r'[^\s,](?:[^,]*[^\s,])?', str(x))) if isinstance(x, str) else x)
 df_dropped['Value'] = df_dropped['Value'].apply(lambda x: re.sub(r'\s+', ' ', str(x)) if isinstance(x, str) else x)
+df_dropped['Value'] = df_dropped['Value'].replace('', 'Filler')
 
 df_dropped.to_csv('CleanedData.csv', index=False)
 
