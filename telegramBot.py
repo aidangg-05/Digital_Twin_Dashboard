@@ -40,7 +40,9 @@ def check_and_send_messages(updater):
     
     # Query MongoDB for data with NodeKey:47 and sort by ServerTimeStamp in descending order
     data = collection.find_one({"NodeKey": 47}, sort=[('ServerTimeStamp', DESCENDING)])
-    
+    print("Data:", data)
+    print(last_node_key_value)
+
     if data:
         value = data.get("Value", "").strip()
         
@@ -56,7 +58,7 @@ def check_and_send_messages(updater):
                 print("Unknown value:", value)
         else:
             print("Value of NodeKey has not changed. No action required.")
-            
+
 # Function to send messages to all stored chat IDs
 def send_messages_to_all(updater, message):
     for chat_id_doc in chat_id_collection.find({}, {"chat_id": 1}):
