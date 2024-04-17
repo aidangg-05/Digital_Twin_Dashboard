@@ -346,7 +346,7 @@ function fetchData() {
 }
 
 
-function EmergencyStop() {
+function errorLog() {
     fetch("/data?NodeKey=74")
         .then((response) => response.json())
         .then((data) => {
@@ -388,10 +388,8 @@ setInterval(() => {
     errorLog(47, "EMG Emergency stop EXIN", "EMG Emergency stop SRV");
 }, 3000); 
 
-
     </script>
 
-    <script src="index.js"></script>
   </body>
 </html>
 
