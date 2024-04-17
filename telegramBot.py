@@ -52,7 +52,7 @@ def check_and_send_messages(updater):
             
             if value == 'EMG Emergency stop EXIN':
                 send_messages_to_all(updater, 'Emergency Stop Activated')  # Pass updater instead of context
-            elif value == 'EMG Emergency stop SRV':
+            elif value == 'Filler':
                 send_messages_to_all(updater, 'Motor Resuming Operations')  # Pass updater instead of context
             else:
                 print("Unknown value:", value)
@@ -81,7 +81,7 @@ def main():
         # Start a separate thread to periodically check for changes in data and send notifications
         while True:
             check_and_send_messages(updater)
-            time.sleep(2)  # Check every minute
+            time.sleep(1)  # Check every minute
     except KeyboardInterrupt:
         # Stop the updater gracefully
         updater.stop()
