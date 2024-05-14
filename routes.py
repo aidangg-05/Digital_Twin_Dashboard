@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint, render_template, jsonify, request, send_file
 from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
 import csv
 
 
@@ -11,7 +12,6 @@ routes = Blueprint('routes', __name__)
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
 db = client["DigitalTwin"]
-
 
 
 # Define route for the index page
@@ -40,7 +40,6 @@ def download_database_csv():
 
     # Send the CSV file as a response for download
     return send_file(csv_file_path, as_attachment=True)
-
 
 app.register_blueprint(routes)
 
