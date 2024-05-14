@@ -12,7 +12,10 @@
       rel="stylesheet"
     />
     <title>Document</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://kit.fontawesome.com/0628264057.js" crossorigin="anonymous"></script>
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='home.css') }}"
@@ -190,6 +193,7 @@
       </div>
     </section>
     <script>
+      
       // Function to open the settings modal
       function openSettings() {
         var modal = document.getElementById("settingsModal");
@@ -246,7 +250,7 @@
         "myGraph15",
         "myGraph16",
       ];
-      var maxDataPoints = 10; // Define the maximum number of data points to display
+      var maxDataPoints = 5; // Define the maximum number of data points to display
 
       // Define colors for each set of graphs
       var colors = [
@@ -257,96 +261,126 @@
       ];
 
       graphIds.forEach(function (graphId, index) {
-        var ctx = document.getElementById(graphId).getContext("2d");
-        var colorIndex = Math.floor(index / 4); // Determine which set of colors to use
-        var color = colors[colorIndex]; // Assign color based on the set
+    var ctx = document.getElementById(graphId).getContext("2d");
+    var colorIndex = Math.floor(index / 4); // Determine which set of colors to use
+    var color = colors[colorIndex]; // Assign color based on the set
 
-        var chart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: [],
-            datasets: [
-              {
-                label: "Value",
-                data: [],
-                backgroundColor: color,
-                borderColor: color,
-                borderWidth: 1,
-              },
-            ],
+    var chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "Value",
+            data: [],
+            backgroundColor: color,
+            borderColor: color,
+            borderWidth: 1,
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              xAxes: [
-                {
-                  type: "time",
-                  time: {
-                    unit: "second",
-                    parser: "HH:mm:ss", // Explicitly specify the datetime format
-                    displayFormats: {
-                      second: "h:mm:ss", // Customize datetime format here
-                    },
-                    tooltipFormat: "h:mm:ss", // Customize tooltip format
-                  },
-                  ticks: {
-                    maxTicksLimit: 50, // Adjust maximum number of ticks as needed
-                  },
-                },
-              ],
-              yAxes: [
-                {
-                  // Add options for the y-axis if needed
-                },
-              ],
+        ],
+      },
+      options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    spanGaps: true,
+    scales: {
+        x: {
+            display: true,
+            type: "time",
+            parsing: false,
+            time: {
+                unit: 'second',
+                stepSize: 1
             },
-          },
-        });
-
-        charts.push(chart);
+            title:{
+                display: true,
+                text: 'TimeStamp', // Title for x-axis
+                color: '#333', // Dark gray color for axis title
+                font: {
+                    size: 14 // Adjust font size if necessary
+                }
+            },
+            grid: {
+                color: 'rgba(200, 200, 200, 0.6)', // Light gray color for grid lines
+                borderColor: 'rgba(180, 180, 180, 0.8)' // Light gray color for border
+            },
+            ticks: {
+                color: '#555', // Dark gray color for tick marks
+                font: {
+                    size: 12 // Adjust font size if necessary
+                }
+            }
+        },
+        y: {
+            display: true,
+            title:{
+                display: true,
+                text: 'Value', // Title for y-axis
+                color: '#333', // Dark gray color for axis title
+                font: {
+                    size: 14 // Adjust font size if necessary
+                }
+            },
+            grid: {
+                color: 'rgba(200, 200, 200, 0.6)', // Light gray color for grid lines
+                borderColor: 'rgba(180, 180, 180, 0.8)' // Light gray color for border
+            },
+            ticks: {
+                color: '#555', // Dark gray color for tick marks
+                font: {
+                    size: 12 // Adjust font size if necessary
+                }
+            }
+        }
+    }
+  }
       });
+
+    charts.push(chart);
+  });
+
 
       // Define an object to store the last timestamp for each chart
 let lastTimestamps = {};
 
+var dataFromDatabase = false; // Variable to track if data is fetched from the database
+
+// Inside fetchData function
 function fetchData() {
-    // Define node keys to fetch data for
-    var nodeKeys = [
-        1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
-    ]; // Example node keys
+  var nodeKeys = [
+    1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
+  ]; // Example node keys
 
-    // Fetch data for each node key
-    nodeKeys.forEach(function (key, index) {
-        fetch("/data?NodeKey=" + key)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data[key]) {
-                    // Check if the timestamp is different from the last one
-                    if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
-                        charts[index].data.labels.push(data[key].ServerTimeStamp);
-                        charts[index].data.datasets[0].data.push(data[key].Value);
+  nodeKeys.forEach(function (key, index) {
+    fetch("/data?NodeKey=" + key)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data[key]) {
+          if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
+            // Assuming data[key] contains ServerTimeStamp and Value
+            var timestamp = new Date(data[key].ServerTimeStamp);
+            charts[index].data.labels.push(timestamp);
+            charts[index].data.datasets[0].data.push(data[key].Value);
 
-                        if (charts[index].data.labels.length > maxDataPoints) {
-                            charts[index].data.labels.shift();
-                            charts[index].data.datasets[0].data.shift();
-                        }
+            if (charts[index].data.labels.length > maxDataPoints) {
+              charts[index].data.labels.shift();
+              charts[index].data.datasets[0].data.shift();
+            }
 
-                        charts[index].update();
-
-                        // Update the last timestamp for this chart
-                        lastTimestamps[key] = data[key].ServerTimeStamp;
-                    } else {
-                        console.log("Timestamp is the same as before, skipping chart update.");
-                    }
-                }
-            })
-            .catch(error => console.error("Error fetching data:", error)); // Handle errors
-    });
+            charts[index].update();
+            lastTimestamps[key] = data[key].ServerTimeStamp;
+            dataFromDatabase = true;
+          } else {
+            console.log("Timestamp is the same as before, skipping chart update.");
+          }
+        }
+      })
+      .catch(error => console.error("Error fetching data:", error)); // Handle errors
+      dataFromDatabase = false;
+  });
 }
 
-
-function EmergencyStop() {
+function errorLog() {
     fetch("/data?NodeKey=74")
         .then((response) => response.json())
         .then((data) => {
@@ -376,6 +410,21 @@ function hideBox() {
     box.style.display = "none";
     overlay.classList.remove("active"); // Remove the active class from the overlay
 }
+function checkDataFromDatabase() {
+  var graphStatusElement = document.getElementById("graphStatus");
+
+  if (dataFromDatabase) {
+    graphStatusElement.innerHTML = '<i class="fas fa-check-circle" style="color: green;" data-toggle="tooltip" title="Data from database"></i>';
+  } else {
+    graphStatusElement.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: red;" data-toggle="tooltip" title="Data not from database"></i>';
+  }
+}
+
+// Call the checkDBStatus function when the page loads
+document.addEventListener("DOMContentLoaded", function() {
+  checkDBStatus();
+  checkDataFromDatabase(); // Check if data is fetched from the database when the page loads
+});
 
 // Fetch data initially
 fetchData();
@@ -388,10 +437,8 @@ setInterval(() => {
     errorLog(47, "EMG Emergency stop EXIN", "EMG Emergency stop SRV");
 }, 3000); 
 
-
     </script>
 
-    <script src="index.js"></script>
   </body>
 </html>
 
