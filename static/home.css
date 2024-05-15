@@ -2,6 +2,14 @@ body {
     font-family: 'Poppins';
 }
 
+#tooltip {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px;
+  display: none;
+  z-index: 9999; /* Set a higher z-index */
+}
 
 .nav-container {
     display: flex;
@@ -13,7 +21,6 @@ body {
     background-color: white; /* Change this to the desired background color */
     z-index: 1000; /* Ensure it's above other content */
 }
-
 
 ul {
     list-style-type: none;
@@ -47,7 +54,7 @@ li {
     font-family: 'Kanit';
     font-size: 25px;
     color:red;
-    margin-right:-120px;
+    margin-right:-45px;
 }
 
 
@@ -197,3 +204,5 @@ a {
   .download-button:hover {
     background-color: #45a049;
   }
+
+

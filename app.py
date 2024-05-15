@@ -1,5 +1,8 @@
+import time
+import threading
 import sqlite3
 import csv
+import time
 import json
 import pymongo 
 import pandas as pd
@@ -12,6 +15,27 @@ import threading
 from routes import routes
 import re
 
+# Function to check database connection status
+def check_db_connection():
+    while True:
+        try:
+            # Attempt to connect to MongoDB
+            client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
+            db = client["DigitalTwin"]
+            collection = db["MotorData"]
+            # If connection successful, break the loop
+            break
+        except Exception as e:
+            print("Failed to connect to database. Retrying in 5 seconds...")
+            time.sleep(5)
+
+# Start a thread to check database connection
+connection_thread = threading.Thread(target=check_db_connection)
+connection_thread.daemon = True
+connection_thread.start()
+
+# Wait for database connection to be established
+connection_thread.join()
 
 #C:\Digital_Twin\Digital_Twin_Dashboard\HistoricalGroup6.dxpdb
 
@@ -53,11 +77,6 @@ num_rows = df_merged.shape[0]
 
 print("Number of rows in MergedData.csv:", num_rows)
 
-client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
-# DB name
-db = client["DigitalTwin"]
-collection = db["MotorData"]
-
 print("debug1")
 
 
@@ -84,6 +103,21 @@ df_dropped.to_csv('CleanedData.csv', index=False)
 
 print("debug2")
 
+# Add this after your existing imports and setup
+last_update_time = time.time()
+
+def update_last_update_time():
+    global last_update_time
+    last_update_time = time.time()
+
+def is_database_updating():
+    # Check if the database has been updated in the last minute
+    return time.time() - last_update_time < 60
+
+@app.route('/update_status')
+def update_status():
+    return jsonify({'updating': is_database_updating()})
+
 def delete_oldest_records():
     # Count the total number of records
     total_records = collection.count_documents({})
@@ -94,6 +128,8 @@ def delete_oldest_records():
         oldest_ids = [record["_id"] for record in oldest_records]
         collection.delete_many({"_id": {"$in": oldest_ids}})
         print("Oldest 500 records deleted.")
+        update_last_update_time()
+
 
 # Call the function to delete oldest records whenever there are 1500 records
 delete_oldest_records()
@@ -118,6 +154,7 @@ print("debug3")
 if new_rows_dict:
     db.MotorData.insert_many(new_rows_dict)
     print("New rows added to MongoDB.")
+    update_last_update_time()
 
 
 print("debug4")

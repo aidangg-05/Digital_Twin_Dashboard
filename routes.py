@@ -1,6 +1,5 @@
 from flask import Flask, Blueprint, render_template, jsonify, request, send_file
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
 import csv
 
 
