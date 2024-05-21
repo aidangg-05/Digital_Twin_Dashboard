@@ -11,6 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Document</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -48,6 +49,15 @@
         </div>
         <div id="Title">CNC Dashboard</div>
         <ul class="links">
+          <li class="notification-container">
+            <i id="notification-icon" class="fas fa-bell notification-icon"></i>
+            <div id="notification-popup" class="notification-popup">
+              <span class="close-btn" onclick="togglePopup()">&times;</span>
+              <div id="error-messages">
+              <p>No new notifications.</p>
+              </div>
+            </div>
+          <li><a id="update-status-icon" class="fas fa-exclamation-circle" style="color: orange;" data-tooltip="No connection to database" onmouseover="showTooltip(event)" onmouseout="hideTooltip()"></a></li>
           <li><a href="#Motor_x">Motor X</a></li>
           <li>•</li>
           <li><a href="#Motor_y">Motor Y</a></li>
@@ -57,6 +67,7 @@
           <li><a href="#spindle">Spindle</a></li>
           <li>•</li>
           <li><a href="#" onclick="openSettings()">Settings</a></li>
+          </li>
         </ul>
       </div>
     <div class="overlay">
@@ -215,22 +226,111 @@
       };
 
       function toggleDarkMode() {
-        var darkModeCheckbox = document.getElementById("darkModeCheckbox");
-        var body = document.body;
-        var spImage = document.getElementById("SP");
+  var darkModeCheckbox = document.getElementById("darkModeCheckbox");
+  var body = document.body;
+  var spImage = document.getElementById("SP");
+  body.classList.toggle("dark-mode");
 
-        if (darkModeCheckbox.checked) {
-          body.classList.add("dark-mode");
-          spImage.src = "{{ url_for('static', filename='img/sp_logo.png') }}"; // Update source for dark mode
-        } else {
-          body.classList.remove("dark-mode");
-          spImage.src = "{{ url_for('static', filename='img/download.png') }}"; // Update source for light mode
-        }
+
+  if (darkModeCheckbox.checked) {
+    body.classList.add("dark-mode");
+    spImage.src = "{{ url_for('static', filename='img/sp_logo.png') }}"; // Update source for dark mode
+
+    // Update chart colors for dark mode
+    charts.forEach(function(chart) {
+      chart.options.scales.x.title.color = '#fff'; // White color for x-axis title
+      chart.options.scales.x.ticks.color = '#fff'; // White color for x-axis tick marks
+      chart.options.scales.x.grid.color = 'rgba(255, 255, 255, 0.6)'; // Light white color for x-axis grid lines
+      chart.options.scales.x.grid.borderColor = 'rgba(255, 255, 255, 0.8)'; // Light white color for x-axis border
+
+      chart.options.scales.y.title.color = '#fff'; // White color for y-axis title
+      chart.options.scales.y.ticks.color = '#fff'; // White color for y-axis tick marks
+      chart.options.scales.y.grid.color = 'rgba(255, 255, 255, 0.6)'; // Light white color for y-axis grid lines
+      chart.options.scales.y.grid.borderColor = 'rgba(255, 255, 255, 0.8)'; // Light white color for y-axis border
+
+      chart.update();
+    });
+  } else {
+    body.classList.remove("dark-mode");
+    spImage.src = "{{ url_for('static', filename='img/download.png') }}"; // Update source for light mode
+
+    // Revert chart colors to default for light mode
+    charts.forEach(function(chart) {
+      chart.options.scales.x.title.color = '#333'; // Dark gray color for x-axis title
+      chart.options.scales.x.ticks.color = '#555'; // Dark gray color for x-axis tick marks
+      chart.options.scales.x.grid.color = 'rgba(200, 200, 200, 0.6)'; // Light gray color for x-axis grid lines
+      chart.options.scales.x.grid.borderColor = 'rgba(180, 180, 180, 0.8)'; // Light gray color for x-axis border
+
+      chart.options.scales.y.title.color = '#333'; // Dark gray color for y-axis title
+      chart.options.scales.y.ticks.color = '#555'; // Dark gray color for y-axis tick marks
+      chart.options.scales.y.grid.color = 'rgba(200, 200, 200, 0.6)'; // Light gray color for y-axis grid lines
+      chart.options.scales.y.grid.borderColor = 'rgba(180, 180, 180, 0.8)'; // Light gray color for y-axis border
+
+      chart.update();
+    });
+  }
+}
+
+function fetchErrorDataAndUpdatePopup() {
+  fetch("/errordata")
+    .then(response => response.json())
+    .then(data => {
+      var notificationPopup = document.getElementById("notification-popup");
+      var notificationIcon = document.getElementById("notification-icon");
+      var errorMessagesContainer = document.getElementById("error-messages");
+      errorMessagesContainer.innerHTML = ''; // Clear previous error messages
+
+      if (data.length > 0) {
+        data.forEach((errorEntry) => {
+          var errorBox = document.createElement("div");
+          errorBox.classList.add("error-box");
+
+          var timestamp = new Date(errorEntry.timestamp);
+          var formattedTimestamp = timestamp.toLocaleString();
+
+          errorBox.innerHTML = `<strong>${formattedTimestamp}:</strong> ${errorEntry.error}`;
+          errorMessagesContainer.appendChild(errorBox);
+        });
+      } else {
+        var noErrorsMessage = document.createElement("p");
+        noErrorsMessage.innerText = "No new notifications.";
+        errorMessagesContainer.appendChild(noErrorsMessage);
       }
+
+      notificationPopup.classList.add("active");
+      notificationIcon.style.color = data.length > 0 ? "red" : "black";
+    })
+    .catch(error => console.error("Error fetching error data:", error));
+}
+
+function togglePopup() {
+  var notificationPopup = document.getElementById("notification-popup");
+  notificationPopup.classList.toggle("active");
+}
+
+document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
+fetchErrorDataAndUpdatePopup();
+setInterval(fetchErrorDataAndUpdatePopup, 5000);
+
+// Function to toggle the notification popup visibility
+function togglePopup() {
+  var notificationPopup = document.getElementById("notification-popup");
+  notificationPopup.classList.toggle("active");
+}
+
+// Event listener for notification icon click event
+document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
+
+// Initial fetch of error data and update of the notification popup
+fetchErrorDataAndUpdatePopup();
+
+setInterval(fetchErrorDataAndUpdatePopup, 5000);
+
       function downloadMongoDBDataCSV() {
         window.location.href = "/download_database_csv";
       }
 
+      var emptyData = Array(5).fill(null);
       var charts = [];
       var graphIds = [
         "myGraph1",
@@ -272,7 +372,7 @@
         datasets: [
           {
             label: "Value",
-            data: [],
+            data: [], // Initialize with empty data
             backgroundColor: color,
             borderColor: color,
             borderWidth: 1,
@@ -295,19 +395,17 @@
             title:{
                 display: true,
                 text: 'TimeStamp', // Title for x-axis
-                color: '#333', // Dark gray color for axis title
                 font: {
                     size: 14 // Adjust font size if necessary
                 }
             },
             grid: {
-                color: 'rgba(200, 200, 200, 0.6)', // Light gray color for grid lines
-                borderColor: 'rgba(180, 180, 180, 0.8)' // Light gray color for border
+                    lineWidth: 3, // Make x-axis grid lines thicker
+                    tickWidth: 0
             },
             ticks: {
-                color: '#555', // Dark gray color for tick marks
                 font: {
-                    size: 12 // Adjust font size if necessary
+                    size: 20 // Adjust font size if necessary
                 }
             }
         },
@@ -316,17 +414,15 @@
             title:{
                 display: true,
                 text: 'Value', // Title for y-axis
-                color: '#333', // Dark gray color for axis title
                 font: {
                     size: 14 // Adjust font size if necessary
                 }
             },
             grid: {
-                color: 'rgba(200, 200, 200, 0.6)', // Light gray color for grid lines
-                borderColor: 'rgba(180, 180, 180, 0.8)' // Light gray color for border
+                    lineWidth: 3, // Make x-axis grid lines thicker
+                    tickWidth: 0
             },
             ticks: {
-                color: '#555', // Dark gray color for tick marks
                 font: {
                     size: 12 // Adjust font size if necessary
                 }
@@ -342,8 +438,6 @@
 
       // Define an object to store the last timestamp for each chart
 let lastTimestamps = {};
-
-var dataFromDatabase = false; // Variable to track if data is fetched from the database
 
 // Inside fetchData function
 function fetchData() {
@@ -369,14 +463,12 @@ function fetchData() {
 
             charts[index].update();
             lastTimestamps[key] = data[key].ServerTimeStamp;
-            dataFromDatabase = true;
           } else {
             console.log("Timestamp is the same as before, skipping chart update.");
           }
         }
       })
       .catch(error => console.error("Error fetching data:", error)); // Handle errors
-      dataFromDatabase = false;
   });
 }
 
@@ -410,21 +502,26 @@ function hideBox() {
     box.style.display = "none";
     overlay.classList.remove("active"); // Remove the active class from the overlay
 }
-function checkDataFromDatabase() {
-  var graphStatusElement = document.getElementById("graphStatus");
 
-  if (dataFromDatabase) {
-    graphStatusElement.innerHTML = '<i class="fas fa-check-circle" style="color: green;" data-toggle="tooltip" title="Data from database"></i>';
-  } else {
-    graphStatusElement.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: red;" data-toggle="tooltip" title="Data not from database"></i>';
-  }
-}
 
-// Call the checkDBStatus function when the page loads
-document.addEventListener("DOMContentLoaded", function() {
-  checkDBStatus();
-  checkDataFromDatabase(); // Check if data is fetched from the database when the page loads
-});
+function showTooltip(event) {
+            var tooltip = document.getElementById("tooltip");
+            tooltip.innerText = event.target.getAttribute("data-tooltip");
+            tooltip.style.display = "block";
+            tooltip.style.top = event.clientY + 10 + "px";
+            tooltip.style.left = event.clientX + 10 + "px";
+        }
+
+        function hideTooltip() {
+            var tooltip = document.getElementById("tooltip");
+            tooltip.style.display = "none";
+        }
+
+// Wait one second before fetching data and logging errors
+setTimeout(function() {
+    // Fetch data initially
+    fetchData();
+    errorLog();
 
 // Fetch data initially
 fetchData();
@@ -436,9 +533,9 @@ setInterval(fetchData, 3000);
 setInterval(() => {
     errorLog(47, "EMG Emergency stop EXIN", "EMG Emergency stop SRV");
 }, 3000); 
-
+    }, 1000);
     </script>
-
+<div id="tooltip" style="position: fixed; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 5px; display: none;"></div>
   </body>
 </html>
 

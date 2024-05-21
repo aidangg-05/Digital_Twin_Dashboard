@@ -1,6 +1,6 @@
 from flask import Flask, Blueprint, render_template, jsonify, request, send_file
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
+import threading
 import csv
 
 
@@ -12,7 +12,7 @@ routes = Blueprint('routes', __name__)
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://digitaltwin:digita1_twin@cnc.jvs9vv2.mongodb.net/')
 db = client["DigitalTwin"]
-
+collection = db['FaultData']
 
 # Define route for the index page
 @routes.route('/')
@@ -40,6 +40,32 @@ def download_database_csv():
 
     # Send the CSV file as a response for download
     return send_file(csv_file_path, as_attachment=True)
+
+@app.route('/log_error', methods=['POST'])
+def log_error():
+    error_data = request.get_json()
+    error_type = error_data.get('error')
+    timestamp = datetime.utcnow()
+
+    if not error_type:
+        return jsonify({'error': 'Invalid error data'}), 400
+
+    # Update existing error of the same type or insert if it doesn't exist
+    result = collection.update_one(
+        {'error': error_type},
+        {'$set': {'timestamp': timestamp}},
+        upsert=True
+    )
+
+    if result.matched_count > 0:
+        return jsonify({'message': 'Error timestamp updated successfully'}), 200
+    else:
+        return jsonify({'message': 'New error logged successfully'}), 201
+
+@app.route('/errordata', methods=['GET'])
+def get_error_data():
+    errors = list(collection.find({}, {'_id': 0, 'error': 1, 'timestamp': 1}))
+    return jsonify(errors)
 
 app.register_blueprint(routes)
 
