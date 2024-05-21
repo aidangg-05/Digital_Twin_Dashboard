@@ -205,4 +205,56 @@ a {
     background-color: #45a049;
   }
 
+ /* Notification styles */
+ .notification-container {
+  position: relative;
+  display: inline-block;
+}
 
+.notification-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.notification-popup {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 30px; /* Increase padding for more space inside */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px; /* Increase max-width for a wider popup */
+  max-height: 400px; /* Increase max-height for a taller popup */
+  overflow-y: auto; /* Add scroll if content exceeds max-height */
+  z-index: 1000;
+}
+
+.notification-popup.active {
+  display: block;
+}
+
+.notification-popup .close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.error-box {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  margin-bottom: 5px;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+}
+
+body.dark-mode .notification-popup {
+  background-color: #333;
+  color: white; /* Ensures text is white in dark mode */
+}
+
+body.dark-mode .notification-popup .close-btn {
+  color: white; /* Ensures the close button is visible in dark mode */
+}

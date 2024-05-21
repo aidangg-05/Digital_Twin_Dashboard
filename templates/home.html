@@ -49,6 +49,14 @@
         </div>
         <div id="Title">CNC Dashboard</div>
         <ul class="links">
+          <li class="notification-container">
+            <i id="notification-icon" class="fas fa-bell notification-icon"></i>
+            <div id="notification-popup" class="notification-popup">
+              <span class="close-btn" onclick="togglePopup()">&times;</span>
+              <div id="error-messages">
+              <p>No new notifications.</p>
+              </div>
+            </div>
           <li><a id="update-status-icon" class="fas fa-exclamation-circle" style="color: orange;" data-tooltip="No connection to database" onmouseover="showTooltip(event)" onmouseout="hideTooltip()"></a></li>
           <li><a href="#Motor_x">Motor X</a></li>
           <li>•</li>
@@ -59,6 +67,7 @@
           <li><a href="#spindle">Spindle</a></li>
           <li>•</li>
           <li><a href="#" onclick="openSettings()">Settings</a></li>
+          </li>
         </ul>
       </div>
     <div class="overlay">
@@ -220,6 +229,8 @@
   var darkModeCheckbox = document.getElementById("darkModeCheckbox");
   var body = document.body;
   var spImage = document.getElementById("SP");
+  body.classList.toggle("dark-mode");
+
 
   if (darkModeCheckbox.checked) {
     body.classList.add("dark-mode");
@@ -259,6 +270,62 @@
     });
   }
 }
+
+function fetchErrorDataAndUpdatePopup() {
+  fetch("/errordata")
+    .then(response => response.json())
+    .then(data => {
+      var notificationPopup = document.getElementById("notification-popup");
+      var notificationIcon = document.getElementById("notification-icon");
+      var errorMessagesContainer = document.getElementById("error-messages");
+      errorMessagesContainer.innerHTML = ''; // Clear previous error messages
+
+      if (data.length > 0) {
+        data.forEach((errorEntry) => {
+          var errorBox = document.createElement("div");
+          errorBox.classList.add("error-box");
+
+          var timestamp = new Date(errorEntry.timestamp);
+          var formattedTimestamp = timestamp.toLocaleString();
+
+          errorBox.innerHTML = `<strong>${formattedTimestamp}:</strong> ${errorEntry.error}`;
+          errorMessagesContainer.appendChild(errorBox);
+        });
+      } else {
+        var noErrorsMessage = document.createElement("p");
+        noErrorsMessage.innerText = "No new notifications.";
+        errorMessagesContainer.appendChild(noErrorsMessage);
+      }
+
+      notificationPopup.classList.add("active");
+      notificationIcon.style.color = data.length > 0 ? "red" : "black";
+    })
+    .catch(error => console.error("Error fetching error data:", error));
+}
+
+function togglePopup() {
+  var notificationPopup = document.getElementById("notification-popup");
+  notificationPopup.classList.toggle("active");
+}
+
+document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
+fetchErrorDataAndUpdatePopup();
+setInterval(fetchErrorDataAndUpdatePopup, 5000);
+
+// Function to toggle the notification popup visibility
+function togglePopup() {
+  var notificationPopup = document.getElementById("notification-popup");
+  notificationPopup.classList.toggle("active");
+}
+
+// Event listener for notification icon click event
+document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
+
+// Initial fetch of error data and update of the notification popup
+fetchErrorDataAndUpdatePopup();
+
+setInterval(fetchErrorDataAndUpdatePopup, 5000);
+
       function downloadMongoDBDataCSV() {
         window.location.href = "/download_database_csv";
       }
@@ -305,7 +372,7 @@
         datasets: [
           {
             label: "Value",
-            data: emptyData, // Initialize with empty data
+            data: [], // Initialize with empty data
             backgroundColor: color,
             borderColor: color,
             borderWidth: 1,
@@ -449,29 +516,6 @@ function showTooltip(event) {
             var tooltip = document.getElementById("tooltip");
             tooltip.style.display = "none";
         }
-
-        function checkUpdateStatus() {
-            fetch("/update_status")
-                .then(response => response.json())
-                .then(data => {
-                    var statusIcon = document.getElementById("update-status-icon");
-                    if (data.updating) {
-                        statusIcon.classList.remove("fa-exclamation-circle");
-                        statusIcon.classList.add("fa-check-circle");
-                        statusIcon.style.color = "green";
-                        statusIcon.setAttribute("data-tooltip", "Connected to database");
-                    } else {
-                        statusIcon.classList.remove("fa-check-circle");
-                        statusIcon.classList.add("fa-exclamation-circle");
-                        statusIcon.style.color = "orange";
-                        statusIcon.setAttribute("data-tooltip", "No connection to database");
-                    }
-                })
-              
-                .catch(error => console.error("Error checking update status:", error));
-              }
-        setInterval(checkUpdateStatus, 5000);
-        checkUpdateStatus();
 
 // Wait one second before fetching data and logging errors
 setTimeout(function() {
