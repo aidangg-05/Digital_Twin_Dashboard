@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 model = 'overvoltage2'  # model name
 normal_model = 'brushless_dc_machine_New'
-Server = xml.Server("http://localhost:1050/RPC2").plecs
+Server = xml.Server("http://localhost:1080/RPC2").plecs
 
 
 # Run simulations and pull the data
