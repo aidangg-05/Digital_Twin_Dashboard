@@ -439,7 +439,8 @@ setInterval(fetchErrorDataAndUpdatePopup, 10000);
             parsing: false,
             time: {
                 unit: 'second',
-                stepSize: 1
+                stepSize: 1,
+                tooltipFormat: 'dd MMM HH:mm:ss'
             },
             title:{
                 display: true,
@@ -488,20 +489,15 @@ setInterval(fetchErrorDataAndUpdatePopup, 10000);
       // Define an object to store the last timestamp for each chart
 let lastTimestamps = {};
 
-// Inside fetchData function
 function fetchData() {
-  var nodeKeys = [
-    1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
-  ]; // Example node keys
-
+  var nodeKeys = [1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44];
   nodeKeys.forEach(function (key, index) {
     fetch("/data?NodeKey=" + key)
       .then((response) => response.json())
       .then((data) => {
         if (data[key]) {
           if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
-            // Assuming data[key] contains ServerTimeStamp and Value
-            var timestamp = new Date(data[key].ServerTimeStamp);
+            var timestamp = new Date(data[key].ServerTimeStamp); // Ensure correct date parsing
             charts[index].data.labels.push(timestamp);
             charts[index].data.datasets[0].data.push(data[key].Value);
 
@@ -512,12 +508,10 @@ function fetchData() {
 
             charts[index].update();
             lastTimestamps[key] = data[key].ServerTimeStamp;
-          } else {
-            console.log("Timestamp is the same as before, skipping chart update.");
           }
         }
       })
-      .catch(error => console.error("Error fetching data:", error)); // Handle errors
+      .catch(error => console.error("Error fetching data:", error));
   });
 }
 
@@ -565,6 +559,7 @@ function showTooltip(event) {
             var tooltip = document.getElementById("tooltip");
             tooltip.style.display = "none";
         }
+
 
 // Wait one second before fetching data and logging errors
 setTimeout(function() {
