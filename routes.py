@@ -64,9 +64,15 @@ def log_error():
 
 @app.route('/errordata', methods=['GET'])
 def get_error_data():
-    errors = list(collection.find({}, {'_id': 0, 'error': 1, 'timestamp': 1}))
-    return jsonify(errors)
+    # Fetch documents with a valid timestamp
+    error_data = list(collection.find({
+        'timestamp': {'$exists': True, '$type': 'date'}
+    }, {"_id": 0}))
 
+    # Sort data by timestamp if needed
+    error_data = sorted(error_data, key=lambda x: x['timestamp'], reverse=True)
+
+    return jsonify(error_data)
 app.register_blueprint(routes)
 
 if __name__ == '__main__':

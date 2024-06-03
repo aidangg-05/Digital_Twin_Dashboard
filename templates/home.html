@@ -57,14 +57,13 @@
               <p>No new notifications.</p>
               </div>
             </div>
-          <li><a id="update-status-icon" class="fas fa-exclamation-circle" style="color: orange;" data-tooltip="No connection to database" onmouseover="showTooltip(event)" onmouseout="hideTooltip()"></a></li>
-          <li><a href="#Motor_x">Motor X</a></li>
+          <li><a href="#Motor_x" class="nav-item" id="nav-motorX">Motor X</a></li>
           <li>•</li>
-          <li><a href="#Motor_y">Motor Y</a></li>
+          <li><a href="#Motor_y" class="nav-item" id="nav-motorY">Motor Y</a></li>
           <li>•</li>
-          <li><a href="#Motor_z">Motor Z</a></li>
+          <li><a href="#Motor_z" class="nav-item" id="nav-motorZ">Motor Z</a></li>
           <li>•</li>
-          <li><a href="#spindle">Spindle</a></li>
+          <li><a href="#spindle" class="nav-item" id="nav-Spindle">Spindle</a></li>
           <li>•</li>
           <li><a href="#" onclick="openSettings()">Settings</a></li>
           </li>
@@ -208,7 +207,52 @@
       </div>
     </section>
     <script>
-      
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('.motor-section');
+    const navItems = document.querySelectorAll('.nav-item');
+
+    function removeActiveClasses() {
+        navItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    function addActiveClass(id) {
+        const activeNavItem = document.querySelector(`#nav-${id}`);
+        if (activeNavItem) {
+            activeNavItem.classList.add('active');
+        }
+    }
+
+    function onScroll() {
+    let currentSectionId;
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+
+        if (pageYOffset >= sectionTop - sectionHeight / 3) {
+            currentSectionId = section.getAttribute('id');
+        }
+    });
+
+    if (currentSectionId) {
+        removeActiveClasses();
+        addActiveClass(currentSectionId);
+        // Add this line to highlight the corresponding navbar item
+        document.querySelector(`a[href="#${currentSectionId}"]`).classList.add('active');
+    }
+  }
+
+    window.addEventListener('scroll', onScroll);
+  });
+
+  function removeActiveClasses() {
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+}
       // Function to open the settings modal
       function openSettings() {
         var modal = document.getElementById("settingsModal");
@@ -276,7 +320,7 @@
 }
 
 function fetchErrorDataAndUpdatePopup() {
-  fetch("/errordata")
+  fetch("/errordata")  // Replace with your actual endpoint
     .then(response => response.json())
     .then(data => {
       var notificationPopup = document.getElementById("notification-popup");
@@ -284,8 +328,11 @@ function fetchErrorDataAndUpdatePopup() {
       var errorMessagesContainer = document.getElementById("error-messages");
       errorMessagesContainer.innerHTML = ''; // Clear previous error messages
 
-      if (data.length > 0) {
-        data.forEach((errorEntry) => {
+      // Filter out errors without a valid timestamp
+      var validErrors = data.filter(errorEntry => errorEntry.timestamp);
+
+      if (validErrors.length > 0) {
+        validErrors.forEach((errorEntry) => {
           var errorBox = document.createElement("div");
           errorBox.classList.add("error-box");
 
@@ -295,14 +342,15 @@ function fetchErrorDataAndUpdatePopup() {
           errorBox.innerHTML = `<strong>${formattedTimestamp}:</strong> ${errorEntry.error}`;
           errorMessagesContainer.appendChild(errorBox);
         });
+        notificationPopup.classList.add("active");
+        notificationIcon.style.color = "red";
       } else {
         var noErrorsMessage = document.createElement("p");
         noErrorsMessage.innerText = "No new notifications.";
         errorMessagesContainer.appendChild(noErrorsMessage);
+        notificationPopup.classList.remove("active");
+        notificationIcon.style.color = "black";
       }
-
-      notificationPopup.classList.add("active");
-      notificationIcon.style.color = data.length > 0 ? "red" : "black";
     })
     .catch(error => console.error("Error fetching error data:", error));
 }
@@ -312,6 +360,7 @@ function togglePopup() {
   notificationPopup.classList.toggle("active");
 }
 
+// Initial fetch and periodic update of error data
 document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
 fetchErrorDataAndUpdatePopup();
 setInterval(fetchErrorDataAndUpdatePopup, 5000);
@@ -328,7 +377,7 @@ document.getElementById("notification-icon").addEventListener("click", fetchErro
 // Initial fetch of error data and update of the notification popup
 fetchErrorDataAndUpdatePopup();
 
-setInterval(fetchErrorDataAndUpdatePopup, 5000);
+setInterval(fetchErrorDataAndUpdatePopup, 10000);
 
       function downloadMongoDBDataCSV() {
         window.location.href = "/download_database_csv";
@@ -394,7 +443,8 @@ setInterval(fetchErrorDataAndUpdatePopup, 5000);
             parsing: false,
             time: {
                 unit: 'second',
-                stepSize: 1
+                stepSize: 1,
+                tooltipFormat: 'dd MMM HH:mm:ss'
             },
             title:{
                 display: true,
@@ -443,20 +493,15 @@ setInterval(fetchErrorDataAndUpdatePopup, 5000);
       // Define an object to store the last timestamp for each chart
 let lastTimestamps = {};
 
-// Inside fetchData function
 function fetchData() {
-  var nodeKeys = [
-    1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44,
-  ]; // Example node keys
-
+  var nodeKeys = [1, 40, 3, 13, 2, 41, 4, 14, 6, 42, 5, 15, 45, 23, 22, 44];
   nodeKeys.forEach(function (key, index) {
     fetch("/data?NodeKey=" + key)
       .then((response) => response.json())
       .then((data) => {
         if (data[key]) {
           if (data[key].ServerTimeStamp !== lastTimestamps[key]) {
-            // Assuming data[key] contains ServerTimeStamp and Value
-            var timestamp = new Date(data[key].ServerTimeStamp);
+            var timestamp = new Date(data[key].ServerTimeStamp); // Ensure correct date parsing
             charts[index].data.labels.push(timestamp);
             charts[index].data.datasets[0].data.push(data[key].Value);
 
@@ -467,12 +512,10 @@ function fetchData() {
 
             charts[index].update();
             lastTimestamps[key] = data[key].ServerTimeStamp;
-          } else {
-            console.log("Timestamp is the same as before, skipping chart update.");
           }
         }
       })
-      .catch(error => console.error("Error fetching data:", error)); // Handle errors
+      .catch(error => console.error("Error fetching data:", error));
   });
 }
 
@@ -520,6 +563,7 @@ function showTooltip(event) {
             var tooltip = document.getElementById("tooltip");
             tooltip.style.display = "none";
         }
+
 
 // Wait one second before fetching data and logging errors
 setTimeout(function() {

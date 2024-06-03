@@ -34,6 +34,14 @@ ul {
     font-family: 'Poppins'
 }
 
+.links li:hover a {
+  /* Change background color, text color, or any other style you want */
+  background-color: #f0f0f0; /* Example background color */
+  color: #333; /* Example text color */
+  border-radius: 5px; /* Example border radius */
+}
+
+
 li {
     padding-right:20px;
 }
@@ -55,10 +63,14 @@ li {
     font-size: 25px;
     color:red;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
     margin-right:-45px;
 >>>>>>> ae9279f5281737699107dafb19b0120b2dacd809
+=======
+    margin-right:-50px;
+>>>>>>> 65601615365b76aef58712e272b8dd877e1edc58
 }
 
 
@@ -261,4 +273,18 @@ body.dark-mode .notification-popup {
 
 body.dark-mode .notification-popup .close-btn {
   color: white; /* Ensures the close button is visible in dark mode */
+}
+
+.nav-item {
+  color: black;
+  text-decoration: none;
+}
+
+.nav-item.active {
+  color: red;  /* Highlighted color */
+  font-weight: bold;
+}
+
+.motor-section {
+  height: 800px;  /* Adjust height based on your content */
 }
