@@ -9,10 +9,23 @@ from pymongo import MongoClient
 import uuid
 import os
 from datetime import datetime, timezone
+import random 
 
 MAX_ROWS = 100  # Define the maximum number of rows to keep in the CSV file
 
-model = 'brushless_dc_machine_New'  # model name
+models = [
+    'overcurrent2',
+    'overvoltage2',
+    'brushless_dc_machine_single_phase_open_circuit',
+    'brushless_dc_machine_abnormally_high_resistance',
+    'brushless_dc_machine_phase_to_phase_short',
+    'Instantaneous_power_off',
+    'brushless_dc_machine_New',
+    'Overspeed'
+]
+
+# Select a model randomly
+model = random.choice(models)
 normal_model = 'brushless_dc_machine_New'
 Server = xml.Server("http://localhost:1080/RPC2").plecs
 
