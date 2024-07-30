@@ -62,15 +62,8 @@ li {
     font-family: 'Kanit';
     font-size: 25px;
     color:red;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-    margin-right:-45px;
->>>>>>> ae9279f5281737699107dafb19b0120b2dacd809
-=======
     margin-right:-50px;
->>>>>>> 65601615365b76aef58712e272b8dd877e1edc58
+
 }
 
 
@@ -245,8 +238,8 @@ a {
   z-index: 1000;
 }
 
-.notification-popup.active {
-  display: block;
+#notification-popup.show {
+  display: block; /* Show when the 'show' class is added */
 }
 
 .notification-popup .close-btn {

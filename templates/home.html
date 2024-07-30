@@ -328,20 +328,21 @@ function fetchErrorDataAndUpdatePopup() {
       var errorMessagesContainer = document.getElementById("error-messages");
       errorMessagesContainer.innerHTML = ''; // Clear previous error messages
 
-      // Filter out errors without a valid timestamp
-      var validErrors = data.filter(errorEntry => errorEntry.timestamp);
+      // Sort errors by timestamp in descending order
+      var sortedErrors = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      if (sortedErrors.length > 0) {
+        // Get the most recent error
+        var latestError = sortedErrors[0];
+        var errorBox = document.createElement("div");
+        errorBox.classList.add("error-box");
 
-      if (validErrors.length > 0) {
-        validErrors.forEach((errorEntry) => {
-          var errorBox = document.createElement("div");
-          errorBox.classList.add("error-box");
+        var timestamp = new Date(latestError.timestamp);
+        var formattedTimestamp = timestamp.toLocaleString();
 
-          var timestamp = new Date(errorEntry.timestamp);
-          var formattedTimestamp = timestamp.toLocaleString();
+        errorBox.innerHTML = `<strong>${formattedTimestamp}:</strong> ${latestError.error}`;
+        errorMessagesContainer.appendChild(errorBox);
 
-          errorBox.innerHTML = `<strong>${formattedTimestamp}:</strong> ${errorEntry.error}`;
-          errorMessagesContainer.appendChild(errorBox);
-        });
         notificationPopup.classList.add("active");
         notificationIcon.style.color = "red";
       } else {
@@ -355,10 +356,16 @@ function fetchErrorDataAndUpdatePopup() {
     .catch(error => console.error("Error fetching error data:", error));
 }
 
+
 function togglePopup() {
-  var notificationPopup = document.getElementById("notification-popup");
-  notificationPopup.classList.toggle("active");
+    const popup = document.getElementById('notification-popup');
+    popup.classList.toggle('show');
+    if (popup.classList.contains('show')) {
+        fetchErrorDataAndUpdatePopup(); // Fetch data when the popup is shown
+    }
 }
+
+
 
 // Initial fetch and periodic update of error data
 document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
@@ -367,17 +374,19 @@ setInterval(fetchErrorDataAndUpdatePopup, 5000);
 
 // Function to toggle the notification popup visibility
 function togglePopup() {
-  var notificationPopup = document.getElementById("notification-popup");
-  notificationPopup.classList.toggle("active");
-}
+          const notificationPopup = document.getElementById('notification-popup');
+          notificationPopup.style.display = notificationPopup.style.display === 'block' ? 'none' : 'block';
+        }
 
 // Event listener for notification icon click event
-document.getElementById("notification-icon").addEventListener("click", fetchErrorDataAndUpdatePopup);
+document.getElementById('notification-icon').addEventListener('click', function() {
+  togglePopup();
+  fetchErrorDataAndUpdatePopup();
+});
+
 
 // Initial fetch of error data and update of the notification popup
 fetchErrorDataAndUpdatePopup();
-
-setInterval(fetchErrorDataAndUpdatePopup, 10000);
 
       function downloadMongoDBDataCSV() {
         window.location.href = "/download_database_csv";
@@ -586,8 +595,3 @@ setInterval(() => {
 <div id="tooltip" style="position: fixed; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 5px; display: none;"></div>
   </body>
 </html>
-
-
-
-
-

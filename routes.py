@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, render_template, jsonify, request, send_file
 from pymongo import MongoClient
 import threading
 import csv
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -35,44 +36,31 @@ def data():
 
 @routes.route('/download_database_csv')
 def download_database_csv():
-    
     csv_file_path = 'CleanedData.csv'
 
     # Send the CSV file as a response for download
     return send_file(csv_file_path, as_attachment=True)
 
-@app.route('/log_error', methods=['POST'])
-def log_error():
-    error_data = request.get_json()
-    error_type = error_data.get('error')
-    timestamp = datetime.utcnow()
-
-    if not error_type:
-        return jsonify({'error': 'Invalid error data'}), 400
-
-    # Update existing error of the same type or insert if it doesn't exist
-    result = collection.update_one(
-        {'error': error_type},
-        {'$set': {'timestamp': timestamp}},
-        upsert=True
-    )
-
-    if result.matched_count > 0:
-        return jsonify({'message': 'Error timestamp updated successfully'}), 200
-    else:
-        return jsonify({'message': 'New error logged successfully'}), 201
-
 @app.route('/errordata', methods=['GET'])
 def get_error_data():
     # Fetch documents with a valid timestamp
-    error_data = list(collection.find({
-        'timestamp': {'$exists': True, '$type': 'date'}
+    error_data = list(db.FaultData.find({
+        'timestamp': {'$exists': True, '$type': 'string'}
     }, {"_id": 0}))
 
-    # Sort data by timestamp if needed
+    # Convert string timestamps to datetime objects for sorting
+    for error in error_data:
+        error['timestamp'] = datetime.strptime(error['timestamp'], '%Y-%m-%d %H:%M:%S')
+
+    # Sort data by timestamp in descending order
     error_data = sorted(error_data, key=lambda x: x['timestamp'], reverse=True)
 
+    # Convert datetime objects back to strings for JSON response
+    for error in error_data:
+        error['timestamp'] = error['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+
     return jsonify(error_data)
+
 app.register_blueprint(routes)
 
 if __name__ == '__main__':
